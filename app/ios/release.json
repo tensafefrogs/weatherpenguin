@@ -1,13 +1,8 @@
 {
   "version": "2.0",
   "xcode27": true,
-  "build": true,
-  "testflight": {
-    "groups": [
-      "Internal"
-    ],
-    "whats_new": "The build submitted to the App Store as 2.0. Settings now save as you change them, with only Done."
-  },
+  "build": false,
+  "testflight": null,
   "app_store": {
     "submit": true,
     "release": "manual",
@@ -34,5 +29,5 @@
     }
   },
   "release_now": false,
-  "note": "2.0: submitted for App Review with the owner's go-ahead (2026-11-18): a fresh build of main, the listing, screenshots and What's New in every language, the review notes and video. Manual release after approval."
+  "note": "2.0: submit for App Review with the owner's go-ahead (2026-11-18), with build 2611181438 (already uploaded); the first try was refused for missing iMessage sticker screenshots, now added. Manual release; the owner asked to release as soon as it's approved."
 }
