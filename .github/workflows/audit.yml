@@ -1,0 +1,24 @@
+# A read-only audit of the app's settings in App Store Connect and the developer portal (app/ios/store/audit.py):
+# what's left over from 1.x and may be stale. Changes nothing. The log and the run summary are public (the repo is),
+# so the script prints counts, types, states and dates only. Run by hand from the Actions tab.
+name: App Store audit
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - run: pip install -q pyjwt==2.10.1 cryptography==44.0.0
+      - name: Audit
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID || vars.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID || vars.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          BUNDLE_ID: ${{ vars.BUNDLE_ID }}
+        run: cd app/ios/store && python3 audit.py
