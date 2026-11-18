@@ -10,7 +10,6 @@ export default {
   "A penguin wearing nothing at all": "아무것도 입지 않은 펭귄",
   "Bikini from": "비키니 시작 온도",
   "Bundle up: sweater, scarf and hat.": "따뜻하게 입으세요: 스웨터, 목도리, 모자.",
-  "Cancel": "취소",
   "Choose when the penguin changes clothes.": "펭귄이 옷을 갈아입는 온도를 선택하세요.",
   "Clear": "맑음",
   "Couldn't get the weather. Please try again in a moment.": "날씨를 가져올 수 없습니다. 잠시 후 다시 시도해 주세요.",

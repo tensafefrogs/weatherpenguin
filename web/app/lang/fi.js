@@ -10,7 +10,6 @@ export default {
   "A penguin wearing nothing at all": "Pingviini ilman mitään vaatteita",
   "Bikini from": "Bikini: alaraja",
   "Bundle up: sweater, scarf and hat.": "Pukeudu lämpimästi: villapaita, kaulahuivi ja pipo.",
-  "Cancel": "Kumoa",
   "Choose when the penguin changes clothes.": "Valitse, milloin pingviini vaihtaa vaatteita.",
   "Clear": "Selkeää",
   "Couldn't get the weather. Please try again in a moment.": "Säätietoja ei saatu. Yritä hetken päästä uudelleen.",

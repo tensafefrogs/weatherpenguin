@@ -10,7 +10,6 @@ export default {
   "A penguin wearing nothing at all": "En pingvin helt uden tøj",
   "Bikini from": "Bikini fra",
   "Bundle up: sweater, scarf and hat.": "Klæd dig varmt på: sweater, halstørklæde og hue.",
-  "Cancel": "Annuller",
   "Choose when the penguin changes clothes.": "Vælg, hvornår pingvinen skifter tøj.",
   "Clear": "Klart",
   "Couldn't get the weather. Please try again in a moment.": "Kunne ikke hente vejret. Prøv igen om lidt.",

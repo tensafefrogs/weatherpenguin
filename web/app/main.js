@@ -194,7 +194,24 @@ function scheduleMorning() {
 
 // ---- Settings --------------------------------------------------------------
 
+// The settings being edited: every change applies at once (the pages behind redraw) and is saved a moment later;
+// closing the sheet, however it's closed, keeps them. `opened` is how they were, for the stats.
 let draft = null;
+let opened = null;
+let saveTimer = 0;
+
+function applyDraft() {
+  state.settings = draft;
+  render();
+  clearTimeout(saveTimer); // a dragged slider sends many changes: save the last one
+  saveTimer = setTimeout(saveNow, 400);
+}
+
+function saveNow() {
+  clearTimeout(saveTimer);
+  saveSettings(state.settings);
+  scheduleMorning();
+}
 
 // v1's four rows. Each handle edits one edge; the neighbouring row moves with it.
 /** The three edges, in order, with what VoiceOver calls each handle. */
@@ -209,6 +226,7 @@ function buildSliders() {
       const celsius = draft.celsius ? shown : ((shown - 32) * 5) / 9;
       draft = clampEdge(draft, key, celsius);
       syncSettingsForm();
+      applyDraft();
     },
   });
   $('scale').querySelector('.scale-labels').before(slider.el);
@@ -249,6 +267,7 @@ let customTime = false;
 
 function openSettings() {
   draft = { ...state.settings };
+  opened = draft;
   customTime = false;
   $('settings').showModal();
   syncSettingsForm(); // after opening, so the scale can measure its width
@@ -280,8 +299,9 @@ function wireSettings() {
   buildSliders();
   for (const radio of document.querySelectorAll('.units input')) {
     radio.addEventListener('change', (e) => {
-      draft.celsius = e.target.value === 'c';
+      draft = { ...draft, celsius: e.target.value === 'c' };
       syncSettingsForm();
+      applyDraft();
     });
   }
   $('morning').hidden = !APP?.reminders;
@@ -295,26 +315,28 @@ function wireSettings() {
   $('morning-pick').addEventListener('change', (e) => {
     const v = e.target.value;
     customTime = v === 'other';
-    draft.morning = v === 'off' ? null : customTime ? draft.morning || $('morning-time').value || '07:00' : v;
+    draft = { ...draft, morning: v === 'off' ? null : customTime ? draft.morning || $('morning-time').value || '07:00' : v };
     syncSettingsForm();
+    applyDraft();
   });
   $('morning-time').addEventListener('change', (e) => {
-    if (draft.morning && e.target.value) draft.morning = e.target.value;
+    if (draft.morning && e.target.value) {
+      draft = { ...draft, morning: e.target.value };
+      applyDraft();
+    }
   });
   $('reset').addEventListener('click', () => {
     draft = { ...DEFAULT_SETTINGS, ...state.defaults, celsius: draft.celsius, morning: draft.morning };
     syncSettingsForm();
+    applyDraft();
   });
+  // Done, Escape or a swipe down: the changes are already applied; save now rather than in a moment
   $('settings').addEventListener('close', () => {
-    if ($('settings').returnValue !== 'done') return;
-    const before = state.settings;
+    saveNow();
+    const before = opened;
     if (Boolean(draft.morning) !== Boolean(before.morning)) track(`morning/${draft.morning ? 'on' : 'off'}`);
     if (draft.celsius !== before.celsius) track(`units/changed-to-${draft.celsius ? 'c' : 'f'}`);
     if (['coldUpper', 'warmLower', 'hotLower'].some((k) => draft[k] !== before[k])) track('settings/temperatures');
-    state.settings = draft;
-    saveSettings(draft);
-    render();
-    scheduleMorning();
   });
   $('gear').addEventListener('click', openSettings);
 }

@@ -10,7 +10,6 @@ export default {
   "A penguin wearing nothing at all": "Een pinguïn zonder kleren",
   "Bikini from": "Bikini vanaf",
   "Bundle up: sweater, scarf and hat.": "Kleed je warm aan: trui, sjaal en muts.",
-  "Cancel": "Annuleer",
   "Choose when the penguin changes clothes.": "Kies wanneer de pinguïn zich omkleedt.",
   "Clear": "Helder",
   "Couldn't get the weather. Please try again in a moment.": "Kan het weer niet ophalen. Probeer het zo nog eens.",

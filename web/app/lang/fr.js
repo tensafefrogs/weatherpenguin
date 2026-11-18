@@ -10,7 +10,6 @@ export default {
   "A penguin wearing nothing at all": "Un pingouin sans aucun vêtement",
   "Bikini from": "Bikini dès",
   "Bundle up: sweater, scarf and hat.": "Couvre-toi bien : pull, écharpe et bonnet.",
-  "Cancel": "Annuler",
   "Choose when the penguin changes clothes.": "Choisis quand le pingouin change de tenue.",
   "Clear": "Dégagé",
   "Couldn't get the weather. Please try again in a moment.": "Impossible d’obtenir la météo. Réessaie dans un instant.",

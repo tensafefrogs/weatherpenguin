@@ -174,7 +174,8 @@ html.fold-h .settings {
   /* on a wide sheet (iPhone Duo propped up like a laptop, iPhone sideways) keep the content a readable width */
   padding-inline: max(22px, calc((100% - 560px) / 2));
 }
-.settings header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.settings header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 4px; }
+.settings header button { justify-self: end; }
 .settings h2 { font-size: 22px; font-weight: 300; margin: 0; }
 .settings h2:focus { outline: none; }
 button.link { font: inherit; font-size: 18px; color: var(--link); background: none; border: 0; padding: 8px 0; cursor: pointer; }

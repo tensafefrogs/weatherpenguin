@@ -10,7 +10,6 @@ export default {
   "A penguin wearing nothing at all": "何も着ていないペンギン",
   "Bikini from": "ビキニの下限",
   "Bundle up: sweater, scarf and hat.": "しっかり着込んで。セーター、マフラー、帽子を。",
-  "Cancel": "キャンセル",
   "Choose when the penguin changes clothes.": "ペンギンが着替える気温を選んでください。",
   "Clear": "晴れ",
   "Couldn't get the weather. Please try again in a moment.": "天気を取得できませんでした。しばらくしてからもう一度お試しください。",

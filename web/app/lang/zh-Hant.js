@@ -10,7 +10,6 @@ export default {
   "A penguin wearing nothing at all": "什麼都沒穿的企鵝",
   "Bikini from": "比基尼起點",
   "Bundle up: sweater, scarf and hat.": "穿暖一點：毛衣、圍巾和帽子。",
-  "Cancel": "取消",
   "Choose when the penguin changes clothes.": "選擇企鵝何時換衣服。",
   "Clear": "晴朗",
   "Couldn't get the weather. Please try again in a moment.": "無法取得天氣。請稍後再試一次。",

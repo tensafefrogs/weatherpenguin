@@ -83,6 +83,8 @@ voice")**
 ## Layout and controls
 
 - One idea per screen. Today and Tomorrow are full-screen pages you swipe between; Settings is a sheet.
+- Settings applies and saves each change as it's made (the pages behind it change too); its only button is Done,
+  and closing it any way keeps the changes. No Cancel.
 - Controls are few and quiet: a gear in the corner, text buttons, outlined pill buttons (1 px black border,
   rounded) for the one main action on a screen.
 - Two-way choices (°F / °C) are a toggle: one outlined pill, the chosen half filled black, sliding across.
