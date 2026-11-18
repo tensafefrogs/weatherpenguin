@@ -1,4 +1,5 @@
 import CoreLocation
+import MapKit
 
 /// One-shot location, about 1 km accurate, as in v1.
 @MainActor
@@ -6,7 +7,6 @@ final class LocationProvider: NSObject, CLLocationManagerDelegate {
   enum Failure: Error { case denied, failed }
 
   private let manager = CLLocationManager()
-  private let geocoder = CLGeocoder()
   private var authorization: CheckedContinuation<Void, Never>?
   private var fix: CheckedContinuation<CLLocation, Error>?
 
@@ -35,9 +35,18 @@ final class LocationProvider: NSObject, CLLocationManagerDelegate {
     }
   }
 
-  /// The city name, or nil. It's a nicety; the forecast works without it.
+  /// The city name, or nil. It's a nicety; the forecast works without it. MapKit's reverse geocoding from iOS 26;
+  /// CLGeocoder, which it replaces (and which iOS 26 deprecates), on older versions. Apple's service either way,
+  /// in the person's language.
   func placeName(for location: CLLocation) async -> String? {
-    let marks = try? await geocoder.reverseGeocodeLocation(location)
+    if #available(iOS 26, *) {
+      guard let request = MKReverseGeocodingRequest(location: location),
+            let item = try? await request.mapItems.first,
+            let address = item.addressRepresentations
+      else { return nil }
+      return address.cityName ?? address.regionName
+    }
+    let marks = try? await CLGeocoder().reverseGeocodeLocation(location)
     return marks?.first.flatMap { $0.locality ?? $0.subAdministrativeArea ?? $0.administrativeArea }
   }
 
