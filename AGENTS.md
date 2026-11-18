@@ -99,6 +99,10 @@ Connect at once.
   spending limit or a failed payment, not the code. Re-running won't help. The run page's annotations say so; the
   owner fixes it in Settings, Billing. (Public repos get standard runners free; if the repo is ever private again,
   macOS minutes count ten times: run the macOS workflows only when needed.)
+- The **Review video** workflow's recording step hung twice in a row (November 2026, cause not found; it has a
+  25-minute limit now), and a scripted swipe between Today and Tomorrow never showed in its recordings. The committed
+  `app/ios/store/review-video.mp4` is from the run before. If it hangs again, add an on-screen or log readout of
+  each step before changing anything else.
 - DNS checks without `dig`: `dns.google/resolve` with several `edns_client_subnet` values (one cache can be hours
   stale). This container's proxy can't reach a host that isn't on the environment's allowlist; ask before adding one.
 - Waiting on a workflow: no foreground `sleep`; run a background loop that fetches `origin/main` until the
