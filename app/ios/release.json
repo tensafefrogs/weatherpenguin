@@ -1,10 +1,15 @@
 {
   "version": "2.0",
   "xcode27": true,
-  "build": false,
-  "testflight": null,
+  "build": true,
+  "testflight": {
+    "groups": [
+      "Internal"
+    ],
+    "whats_new": "The build submitted to the App Store as 2.0. Settings now save as you change them, with only Done."
+  },
   "app_store": {
-    "submit": false,
+    "submit": true,
     "release": "manual",
     "whats_new": {
       "en-US": "Weather Penguin 2.0: the same hand-drawn penguin, rebuilt.\n- Weather from Apple Weather, for where you are\n- Home Screen and Lock Screen widgets\n- Ask Siri: \"What should I wear?\"\n- An Apple Watch app with watch face complications\n- An optional morning notification with what to wear\n- One slider to choose when the penguin changes clothes\n- iPad, 17 languages and larger text",
@@ -29,5 +34,5 @@
     }
   },
   "release_now": false,
-  "note": "2.0: listing, captioned screenshots and What's New in every App Store language. Not submitted (submit false); submission waits for the owner's go-ahead."
+  "note": "2.0: submitted for App Review with the owner's go-ahead (2026-11-18): a fresh build of main, the listing, screenshots and What's New in every language, the review notes and video. Manual release after approval."
 }
