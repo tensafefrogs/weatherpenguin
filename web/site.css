@@ -62,13 +62,9 @@ img { max-width: 100%; height: auto; }
 .pitch { text-align: center; font: 400 clamp(30px, 6vw, 40px)/1.15 var(--hand); max-width: 460px; }
 .pitch p { margin: 0 0 24px; }
 
-.store {
-  display: inline-flex; align-items: center; gap: 10px;
-  background: #000; color: #fff; text-decoration: none;
-  font: 500 17px/1.2 "Inter", sans-serif;
-  padding: 10px 20px; border-radius: 10px;
-}
-.store small { display: block; font-size: 11px; font-weight: 400; }
+/* Apple's official badge (img/app-store-badge.svg, from developer.apple.com), unaltered, at least 40 px tall */
+.store { display: inline-block; line-height: 0; border-radius: 10px; }
+.store img { display: block; width: 180px; height: auto; }
 
 .phone {
   width: 300px; height: 620px;

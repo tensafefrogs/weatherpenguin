@@ -266,6 +266,8 @@ screenshots, trailers and app preview (`app/ios/store/`, `web/press/`, `docs/`),
 welcome to build and run the code for yourself, but please don't publish an app or site that uses the name or the
 drawings. If you build your own app from this code, give it your own name and art.
 
+The App Store badge (`web/img/app-store-badge.svg`) is Apple's, used under Apple's marketing guidelines.
+
 The fonts are under the SIL Open Font License: Inter (`web/app/fonts/Inter-OFL.txt`) and Sue Ellen Francisco
 (`web/fonts/SueEllenFrancisco-OFL.txt`).
 
