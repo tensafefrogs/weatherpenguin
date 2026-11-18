@@ -63,8 +63,10 @@ def main():
                 f" {(rel.get('secondaryCategory', {}).get('data') or {}).get('id')}")
         decl = get(f"/v1/appInfos/{info['id']}/ageRatingDeclaration")
         if decl and decl.get('data'):
-            answers = {k: v for k, v in decl['data']['attributes'].items() if v not in (None, 'NONE', False)}
+            attrs = decl['data']['attributes']
+            answers = {k: v for k, v in attrs.items() if v not in (None, 'NONE', False)}
             say(f"  Age rating answers that aren't none/no: {answers or 'none'}")
+            say(f"  Age rating questions not answered: {', '.join(sorted(k for k, v in attrs.items() if v is None)) or 'none'}")
         locs = (get(f"/v1/appInfos/{info['id']}/appInfoLocalizations?limit=200") or {}).get('data', [])
         stale = [l['attributes']['locale'] for l in locs if 'weatherpenguin.com/privacy' not in (l['attributes'].get('privacyPolicyUrl') or '')]
         say(f"  Languages: {len(locs)}: {', '.join(sorted(l['attributes']['locale'] for l in locs))}")
@@ -73,8 +75,9 @@ def main():
     say('\n## Versions')
     for v in every(f'/v1/apps/{app_id}/appStoreVersions?limit=50'):
         va = v['attributes']
+        # the copyright line only as whether it names EEG LLC: old versions' lines can name a person (public log)
         say(f"- {va['versionString']} ({va.get('platform')}): {va.get('appStoreState')}, release {va.get('releaseType')},"
-            f" copyright \"{va.get('copyright')}\"")
+            f" copyright names EEG LLC: {'EEG LLC' in (va.get('copyright') or '')}")
         if va.get('appStoreState') in ('PREPARE_FOR_SUBMISSION', 'WAITING_FOR_REVIEW', 'IN_REVIEW', 'READY_FOR_DISTRIBUTION', 'READY_FOR_SALE'):
             locs = (get(f"/v1/appStoreVersions/{v['id']}/appStoreVersionLocalizations?limit=200") or {}).get('data', [])
             urls = collections.Counter((l['attributes'].get('supportUrl'), l['attributes'].get('marketingUrl')) for l in locs)
