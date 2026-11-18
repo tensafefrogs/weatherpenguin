@@ -189,7 +189,7 @@ def upload_screenshots(vloc_id, screenshots, base):
                 upload_parts(blob, shot['attributes']['uploadOperations'])
                 patch('appScreenshots', shot['id'], {'uploaded': True, 'sourceFileChecksum': hashlib.md5(blob).hexdigest()})
             print('Screenshots:', display, len(files), 'uploaded')
-        except Exception as e:
+        except (Exception, SystemExit) as e:
             # the iPhone and iPad sets are required; any others are skipped with a note rather than stopping the release
             if display in REQUIRED: raise
             print('Screenshots:', display, 'skipped:', e)

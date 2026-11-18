@@ -84,9 +84,14 @@ def log(*a):
 def upload_parts(blob, operations, timeout=120):
     """Send a file's bytes to the upload operations App Store Connect handed back for it"""
     for op in operations or []:
-        req = urllib.request.Request(op['url'], data=blob[op['offset']:op['offset'] + op['length']], method=op['method'],
-                                     headers={h['name']: h['value'] for h in op['requestHeaders']})
-        urllib.request.urlopen(req, timeout=timeout).read()
+        for attempt in range(3):   # Apple's upload servers drop a connection now and then
+            req = urllib.request.Request(op['url'], data=blob[op['offset']:op['offset'] + op['length']], method=op['method'],
+                                         headers={h['name']: h['value'] for h in op['requestHeaders']})
+            try:
+                urllib.request.urlopen(req, timeout=timeout).read(); break
+            except (TimeoutError, ConnectionError, urllib.error.URLError) as e:
+                if attempt == 2 or (isinstance(e, urllib.error.HTTPError) and e.code < 500): raise
+                print(f'Upload interrupted ({e}); trying again', flush=True); time.sleep(10 * (attempt + 1))
 
 
 def app():

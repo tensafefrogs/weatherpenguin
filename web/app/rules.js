@@ -104,9 +104,13 @@ export function formatTemp(tempC, celsius, locale = 'en') {
   return new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: false }).format(tempC);
 }
 
-/** Keeps the three edges in order with at least `gap` °C between them. */
-export function clampSettings(s, gap = 1) {
-  const coldUpper = Math.min(s.coldUpper, s.warmLower - gap);
-  const hotLower = Math.max(s.hotLower, s.warmLower + gap);
-  return { ...s, coldUpper, hotLower };
+/** Moves one edge (°C) of the settings, keeping a gap from its neighbours (half a degree °C, or 1 °F), within v1's 0–37.77 °C. */
+export function clampEdge(s, key, c) {
+  const gap = s.celsius ? 0.5 : 5 / 9;
+  const bounds = {
+    coldUpper: [0, s.warmLower - gap],
+    warmLower: [s.coldUpper + gap, s.hotLower - gap],
+    hotLower: [s.warmLower + gap, 37.77],
+  }[key];
+  return { ...s, [key]: Math.min(bounds[1], Math.max(bounds[0], c)) };
 }

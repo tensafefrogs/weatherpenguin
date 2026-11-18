@@ -45,7 +45,7 @@ the temperature, and one line of advice. Tomorrow is one swipe away. That's the 
 | Ink | `#000000` | the big number, titles, advice |
 | Soft | `#3c4150` | secondary text: High/Low, the condition, hints |
 | Link | `#1f5fbf` | text buttons and links (4.7:1 on Sky; the website uses it too) |
-| Control blue | `#0073f0` | slider fill and focus rings only (3.5:1: fine for shapes, too light for text) |
+| Control blue | `#0073f0` | focus rings only (3.5:1: fine for shapes, too light for text) |
 
 - No dark mode: the app is always light, on Sky (`UIUserInterfaceStyle: Light`). The penguins are drawn for a
   light background.
@@ -63,8 +63,9 @@ The website (`web/site.css`) has its own, slightly different palette: a sky blue
 - Sizes on a phone: temperature 72 pt at weight 100 (52 on short screens, 110 on iPad), day title 22, High/Low
   and condition 22, error titles 30, settings text 17 to 20, small print 12 to 16.
 - Sentence case everywhere. No all-caps, no bold except the Done button.
-- Numbers: whole °F; °C to one decimal in the person's number format (`formatTemp` in `rules.js`). Always the `°`
-  sign; the unit letter only in Settings.
+- Numbers: whole °F; °C to one decimal in the person's number format (`formatTemp` in `rules.js`). The phone and watch
+  show the bare number, as v1 did ("59", "High of 63"); widgets, the Lock Screen, Siri and Settings add the `°`. The
+  unit letter only in Settings.
 
 ## Voice
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_SETTINGS, clampSettings, formatTemp, outfitFor, pages, rainToday, rainTomorrow } from '../rules.js';
+import { DEFAULT_SETTINGS, clampEdge, formatTemp, outfitFor, pages, rainToday, rainTomorrow } from '../rules.js';
 import { SAMPLE_NAMES, sampleWeather } from '../samples.js';
 
 test('bands follow v1 defaults and edges', () => {
@@ -63,7 +63,9 @@ test('a condition that already says rain is not repeated', () => {
   assert.deepEqual([tomorrow.outfit, tomorrow.rain, tomorrow.rainyCondition], ['hot_rain', true, true]);
 });
 
-test('settings stay ordered', () => {
-  const s = clampSettings({ ...DEFAULT_SETTINGS, coldUpper: 25 });
+test('a moved edge stays between its neighbours and inside the slider', () => {
+  const s = clampEdge(DEFAULT_SETTINGS, 'coldUpper', 25);
   assert.ok(s.coldUpper < s.warmLower && s.warmLower < s.hotLower);
+  assert.equal(clampEdge(DEFAULT_SETTINGS, 'hotLower', 50).hotLower, 37.77);
+  assert.equal(clampEdge(DEFAULT_SETTINGS, 'coldUpper', -5).coldUpper, 0);
 });

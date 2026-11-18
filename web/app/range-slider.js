@@ -1,5 +1,5 @@
-// v1's range slider (WPRangeSlider): a rounded grey track, a blue fill for
-// the band, and white round handles. Any number of handles, in order.
+// v1's range slider (WPRangeSlider): a rounded grey track and white round
+// handles. Any number of handles, in order (Settings uses three).
 //
 // Each handle is a real <input type="range"> kept out of sight, so VoiceOver
 // and keyboards adjust it natively. Touch and mouse drags go through pointer
@@ -8,15 +8,11 @@
 export class RangeSlider {
   /**
    * @param {object} opts
-   * @param {{key: string, label: string}[]} opts.handles  one or two, in order
-   * @param {'min'|'handle'|null} opts.fillFrom  where the blue band starts (null: no band)
-   * @param {'max'|'handle'|null} opts.fillTo    where it ends
+   * @param {{key: string, label: string}[]} opts.handles  in order
    * @param {(key: string, value: number) => void} opts.onInput  value in display units
    */
-  constructor({ handles, fillFrom, fillTo, onInput }) {
+  constructor({ handles, onInput }) {
     this.handles = handles;
-    this.fillFrom = fillFrom;
-    this.fillTo = fillTo;
     this.onInput = onInput;
     this.range = { min: 0, max: 100, step: 1 };
     this.values = {};
@@ -24,8 +20,7 @@ export class RangeSlider {
 
     this.el = document.createElement('div');
     this.el.className = 'range';
-    this.el.innerHTML = '<div class="range-track"><div class="range-fill"></div></div>';
-    this.fill = this.el.querySelector('.range-fill');
+    this.el.innerHTML = '<div class="range-track"></div>';
 
     this.inputs = {};
     this.thumbs = {};
@@ -62,13 +57,6 @@ export class RangeSlider {
       input.setAttribute('aria-valuetext', format(values[h.key]));
       this.thumbs[h.key].style.setProperty('--at', this.#fraction(values[h.key]));
     }
-    this.fill.hidden = this.fillFrom == null;
-    if (this.fillFrom == null) return;
-    const keys = this.handles.map((h) => h.key);
-    const from = this.fillFrom === 'min' ? 0 : this.#fraction(values[keys[0]]);
-    const to = this.fillTo === 'max' ? 1 : this.#fraction(values[keys.at(-1)]);
-    this.fill.style.setProperty('--from', from);
-    this.fill.style.setProperty('--to', to);
   }
 
   /** Where a value sits along the track, 0 to 1. */

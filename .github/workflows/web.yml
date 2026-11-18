@@ -4,6 +4,9 @@ on:
     paths: ['web/**', '.github/workflows/web.yml']
   pull_request:
     paths: ['web/**', '.github/workflows/web.yml']
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest

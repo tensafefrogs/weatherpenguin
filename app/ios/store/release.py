@@ -221,8 +221,12 @@ def stuck_screenshots(v, fix=False):
     """Name the screenshots App Store Connect hasn't finished processing. With fix, upload each one again: an upload
     can stay at UPLOAD_COMPLETE for good, and deleting it and uploading the same file again is the usual cure."""
     import hashlib
-    files = {os.path.basename(p): p for ps in json.load(open(os.path.join(HERE, 'listing.json')))['screenshots'].values() for p in ps}
+    names = {os.path.basename(p) for ps in json.load(open(os.path.join(HERE, 'listing.json')))['screenshots'].values() for p in ps}
     for loc in call('GET', f"/v1/appStoreVersions/{v['id']}/appStoreVersionLocalizations?limit=200")['data']:
+        # each language's own files (other languages' are made in the listing workflow, so may not be here)
+        locale = loc['attributes']['locale']
+        folder = os.path.join(HERE, 'screenshots') if locale == 'en-US' else os.path.join(HERE, 'screenshots', 'l10n', locale)
+        files = {n: os.path.join(folder, n) for n in names if os.path.exists(os.path.join(folder, n))}
         for st in call('GET', f"/v1/appStoreVersionLocalizations/{loc['id']}/appScreenshotSets")['data']:
             shots = call('GET', f"/v1/appScreenshotSets/{st['id']}/appScreenshots")['data']
             order, changed = [x['id'] for x in shots], False
@@ -234,7 +238,7 @@ def stuck_screenshots(v, fix=False):
                     (sh['attributes'].get('assetDeliveryState') or {}).get('errors') or '')
                 if not fix or name not in files: continue
                 # the replacement first, then the stuck one goes: a failed upload never leaves the set a screenshot short
-                blob = open(os.path.join(HERE, files[name]), 'rb').read()
+                blob = open(files[name], 'rb').read()
                 new = create('appScreenshots', {'fileName': name, 'fileSize': len(blob)}, {'appScreenshotSet': rel('appScreenshotSets', st['id'])})
                 upload_parts(blob, new['attributes']['uploadOperations'])
                 patch('appScreenshots', new['id'], {'uploaded': True, 'sourceFileChecksum': hashlib.md5(blob).hexdigest()})
@@ -259,8 +263,8 @@ def submit_for_review(app_id, v):
         try:
             items = call('GET', f"/v1/reviewSubmissions/{s['id']}/items?include=appStoreVersion")['data']
             if not any((i['relationships'].get('appStoreVersion', {}).get('data') or {}).get('id') == v['id'] for i in items):
-                create('reviewSubmissionItems', relationships={'reviewSubmission': rel('reviewSubmissions', s['id']),
-                                                              'appStoreVersion': rel('appStoreVersions', v['id'])})
+                request('POST', '/v1/reviewSubmissionItems', {'data': {'type': 'reviewSubmissionItems', 'relationships': {
+                    'reviewSubmission': rel('reviewSubmissions', s['id']), 'appStoreVersion': rel('appStoreVersions', v['id'])}}})
             request('PATCH', f"/v1/reviewSubmissions/{s['id']}",
                     {'data': {'type': 'reviewSubmissions', 'id': s['id'], 'attributes': {'submitted': True}}})
             break
@@ -392,7 +396,7 @@ def status():
     for g in call('GET', f'/v1/apps/{app_id}/betaGroups?limit=50')['data']:
         ga = g['attributes']
         lines.append(f"- {ga['name']}: {'internal' if ga.get('isInternalGroup') else 'external'}"
-                     + (f", public link: {ga.get('publicLink')}" if ga.get('publicLinkEnabled') and ga.get('publicLink') else ', public link on' if ga.get('publicLinkEnabled') else '')
+                     + (', public link on (App Store Connect shows it)' if ga.get('publicLinkEnabled') else '')
                      + testers(g['id']))
     out = os.path.join(HERE, 'status.md')
     new = '\n'.join(lines) + '\n'
@@ -412,6 +416,9 @@ def pending():
     app_id = get_app()['id']; version = cfg['version']
     v = next((x for x in versions(app_id)['data'] if x['attributes']['versionString'] == version), None)
     if v and vstate(v) != 'PREPARE_FOR_SUBMISSION': return
+    # a version already being prepared only waits for something when it's to be submitted; otherwise there's nothing
+    # to do, and redoing the listing every 6 hours would replace its screenshots four times a day for nothing
+    if v and not store.get('submit'): return
     if other_version(app_id, version, BUSY): return
     rejected = other_version(app_id, version, REJECTED)
     if rejected:

@@ -6,12 +6,16 @@ name: App Store listing
 on:
   push:
     branches: [main]
-    paths: ['app/ios/store/listing.json', 'app/ios/store/l10n/*', 'app/ios/store/screenshots/*.png', 'app/ios/store/captions.json', 'app/ios/store/previews/*', 'app/ios/store/creative.py', 'app/ios/store/upload_listing.py', '.github/workflows/store.yml']
+    paths: ['app/ios/store/listing.json', 'app/ios/store/l10n/*', 'app/ios/store/screenshots/**', 'app/ios/store/screenshots.js', 'app/ios/store/captions.json', 'app/ios/store/previews/*', 'app/ios/store/creative.py', 'app/ios/store/upload_listing.py', '.github/workflows/store.yml']
   workflow_dispatch:
 
 # one run at a time, so two never edit App Store Connect at once
+permissions:
+  contents: read
+
+# one App Store Connect job at a time, shared with the App Store release workflow, so two never edit it at once
 concurrency:
-  group: app-store-listing
+  group: app-store-connect
   cancel-in-progress: false
 
 jobs:
@@ -19,26 +23,36 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       ok: ${{ steps.secrets.outputs.ok }}
-    env:
-      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
-      BUNDLE_ID: ${{ vars.BUNDLE_ID }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Check the secrets are set
         id: secrets
+        env:
+          HAVE_KEY: ${{ secrets.ASC_KEY_P8 != '' }}
+          BUNDLE_ID: ${{ vars.BUNDLE_ID }}
         run: |
-          if [ -z "$ASC_KEY_P8" ] || [ -z "$BUNDLE_ID" ]; then echo "::notice::App Store Connect secrets or the BUNDLE_ID variable aren't set yet (README.md, Releasing); nothing uploaded."; echo ok=false >> "$GITHUB_OUTPUT"; else echo ok=true >> "$GITHUB_OUTPUT"; fi
-      - run: pip install pyjwt cryptography
+          if [ "$HAVE_KEY" != true ] || [ -z "$BUNDLE_ID" ]; then echo "::notice::App Store Connect secrets or the BUNDLE_ID variable aren't set yet (README.md, Releasing); nothing uploaded."; echo ok=false >> "$GITHUB_OUTPUT"; else echo ok=true >> "$GITHUB_OUTPUT"; fi
+      - run: pip install -q pyjwt==2.10.1 cryptography==44.0.0
         if: steps.secrets.outputs.ok == 'true'
       - name: Upload listing and screenshots
         if: steps.secrets.outputs.ok == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          BUNDLE_ID: ${{ vars.BUNDLE_ID }}
         run: python3 app/ios/store/upload_listing.py
       - name: App preview video
         # a new API (App Store Connect API 4.5): a failure here is reported but doesn't fail the listing
         if: steps.secrets.outputs.ok == 'true'
         continue-on-error: true
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          BUNDLE_ID: ${{ vars.BUNDLE_ID }}
         run: python3 app/ios/store/creative.py
 
   # Each other language: the app in that language, captured here (not kept in the repo), then uploaded
@@ -51,13 +65,10 @@ jobs:
       fail-fast: false
       matrix:
         locale: [de-DE, fr-FR, es-ES, es-MX, it, pt-BR, pt-PT, nl-NL, sv, da, no, fi, pl, ru, ja, ko, zh-Hans, zh-Hant]
-    env:
-      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
-      BUNDLE_ID: ${{ vars.BUNDLE_ID }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v5
         with:
           node-version: 22
@@ -75,6 +86,11 @@ jobs:
           name: screenshots-${{ matrix.locale }}
           path: app/ios/store/screenshots/l10n/${{ matrix.locale }}/*.png
           retention-days: 30
-      - run: pip install pyjwt cryptography
+      - run: pip install -q pyjwt==2.10.1 cryptography==44.0.0
       - name: Upload them
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          BUNDLE_ID: ${{ vars.BUNDLE_ID }}
         run: python3 app/ios/store/upload_listing.py --locale ${{ matrix.locale }}

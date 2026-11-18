@@ -35,6 +35,9 @@ defaults:
   run:
     shell: bash
 
+permissions:
+  contents: read
+
 jobs:
   build:
     # Xcode 27.1 is only on GitHub's xcode-27 preview machines, used when asked (inputs are empty on a push, so a

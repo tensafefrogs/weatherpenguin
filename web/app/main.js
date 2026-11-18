@@ -1,7 +1,7 @@
 import { isNative, post } from './bridge.js';
 import { LANG, T, loadLanguage, prefersFahrenheit, translateDocument } from './i18n.js';
 import { morningItems } from './morning.js';
-import { DEFAULT_SETTINGS, OUTFITS, formatTemp, pages } from './rules.js';
+import { DEFAULT_SETTINGS, OUTFITS, clampEdge, formatTemp, pages } from './rules.js';
 import { RangeSlider } from './range-slider.js';
 import { watchLayout } from './layout.js';
 import { startStats, track } from './stats.js';
@@ -30,6 +30,7 @@ window.WP = {
     scheduleMorning();
   },
   onLoading() {
+    clearTimeout(errorTimer); // an error from the last try mustn't land on top of this one
     state.loading = true;
     loadingSince = Date.now();
     render();
@@ -44,7 +45,8 @@ window.WP = {
     scheduleMorning();
   },
   onError(e) {
-    track(`error/${e.code}`, { once: true });
+    // known codes only: in a browser the code comes from the URL, and stats never carry free text
+    track(`error/${e.code in MESSAGES ? e.code : 'other'}`, { once: true });
     // show "Loading..." for a moment even when it fails at once, so Try Again visibly does something
     clearTimeout(errorTimer);
     errorTimer = setTimeout(() => {
@@ -102,7 +104,7 @@ function dayPage(p, place) {
   const big = temp(p.temp);
   const high = temp(p.high);
   const low = temp(p.low);
-  const label = p.high != null ? T('Now {t} degrees', { t: big }) : T('High of {t} degrees', { t: big });
+  const label = p.title === 'Today' ? T('Now {t} degrees', { t: big }) : T('High of {t} degrees', { t: big });
   return el(
     'section',
     { class: `page${p.rain ? ' rain' : ''}`, 'aria-label': T(p.title) },
@@ -184,7 +186,9 @@ function renderAttribution(a) {
 // ---- Morning notification (morning.js) ------------------------------------------
 
 function scheduleMorning() {
-  if (!APP?.reminders) return;
+  // With the reminder on but no forecast yet (settings arrive first at launch), leave what's scheduled alone: an
+  // empty list would cancel tomorrow's notification, and offline no forecast may come to schedule it again.
+  if (!APP?.reminders || (state.settings.morning && !state.weather)) return;
   post({ type: 'reminders', time: state.settings.morning, items: morningItems(state.weather, state.settings) });
 }
 
@@ -201,8 +205,6 @@ let slider = null;
 function buildSliders() {
   slider = new RangeSlider({
     handles: EDGES.map(([key, label]) => ({ key, label: T(label) })),
-    fillFrom: null,
-    fillTo: null,
     onInput: (key, shown) => {
       const celsius = draft.celsius ? shown : ((shown - 32) * 5) / 9;
       draft = clampEdge(draft, key, celsius);
@@ -241,17 +243,6 @@ function layoutScale() {
   spread(edges, 46, width).forEach((x, i) => (labels[i].style.left = `${x}px`));
 }
 
-/** Moves one edge, keeping at least one degree between edges, within v1's 0–37.77 °C range. */
-function clampEdge(s, key, c) {
-  const gap = s.celsius ? 0.5 : 5 / 9;
-  const bounds = {
-    coldUpper: [0, s.warmLower - gap],
-    warmLower: [s.coldUpper + gap, s.hotLower - gap],
-    hotLower: [s.warmLower + gap, 37.77],
-  }[key];
-  return { ...s, [key]: Math.min(bounds[1], Math.max(bounds[0], c)) };
-}
-
 /** The morning notification's preset times; Other time… allows any. */
 const MORNING_TIMES = ['06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00'];
 let customTime = false;
@@ -266,14 +257,15 @@ function openSettings() {
 function syncSettingsForm() {
   const c = draft.celsius;
   // v1 slider range: 0–37.77 °C (32–100 °F), in whole °F or half °C.
-  const shown = (v) => (c ? Math.round(v * 2) / 2 : Math.round((v * 9) / 5 + 32));
+  const shown = (v) => (c ? Math.min(37.5, Math.round(v * 2) / 2) : Math.round((v * 9) / 5 + 32));
   const t = (v) => `${formatTemp(v, c, LANG)}°`;
   const values = { coldUpper: shown(draft.coldUpper), warmLower: shown(draft.warmLower), hotLower: shown(draft.hotLower) };
   const range = c ? { min: 0, max: 37.5, step: 0.5 } : { min: 32, max: 100, step: 1 };
   const format = (v) => T('{t} degrees', { t: c ? formatTemp(v, true, LANG) : v });
   slider.update({ ...range, values, format });
   const labels = $('scale').querySelectorAll('.scale-labels span');
-  EDGES.forEach(([key], i) => (labels[i].textContent = t(draft[key])));
+  // the label says what the handle shows (°C in half degrees), not the stored value
+  EDGES.forEach(([key], i) => (labels[i].textContent = c ? `${formatTemp(values[key], true, LANG)}°` : t(draft[key])));
   layoutScale();
   document.querySelector(`.units input[value=${c ? 'c' : 'f'}]`).checked = true;
 

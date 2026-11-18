@@ -18,6 +18,9 @@ APPLE_TEAM_ID=$(printf '%s' "$APPLE_TEAM_ID" | tr -d '[:space:]')
 BUNDLE_ID=$(printf '%s' "$BUNDLE_ID" | tr -d '[:space:]')
 tmp=${RUNNER_TEMP:-$(mktemp -d)}
 key="$tmp/AuthKey_$ASC_KEY_ID.p8"
+umask 077   # the key file readable by this user only
+# the key is removed however the script ends, a failed archive or export included
+trap 'rm -f "$key" ~/.appstoreconnect/private_keys/"AuthKey_$ASC_KEY_ID.p8"' EXIT
 # The .p8 in its standard layout: a pasted key can lose its line breaks, which Xcode's sign-in rejects.
 printf '%s' "$ASC_KEY_P8" | python3 -c '
 import re, sys

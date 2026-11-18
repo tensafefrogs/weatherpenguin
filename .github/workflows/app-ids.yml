@@ -16,5 +16,5 @@ jobs:
       BUNDLE_ID: ${{ vars.BUNDLE_ID }}
     steps:
       - uses: actions/checkout@v5
-      - run: pip install -q pyjwt cryptography
+      - run: pip install -q pyjwt==2.10.1 cryptography==44.0.0
       - run: cd app/ios/store && python3 app_ids.py

@@ -22,11 +22,16 @@ export function morningItems(weather, settings, now = new Date()) {
     ].filter(Boolean).join(' ');
     items.push({ date: isoDate(day), time: settings.morning, title: T(ADVICE[p.outfit]), body, outfit: p.outfit });
   };
-  const at = new Date(now);
-  at.setHours(hh, mm, 0, 0);
-  if (at > now) add(today, now, today.high);
-  const next = new Date(now);
-  next.setDate(next.getDate() + 1);
-  add(tomorrow, next, tomorrow.temp);
+  // each day's date from the forecast itself, so a forecast from before midnight never lands on the wrong day;
+  // a notification whose time has passed is left out
+  const dayOf = (i, offset) => {
+    const d = weather.daily?.[i]?.date ? new Date(weather.daily[i].date) : new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+    d.setHours(hh, mm, 0, 0);
+    return d;
+  };
+  const first = dayOf(0, 0);
+  if (first > now) add(today, first, today.high);
+  const second = dayOf(1, 1);
+  if (second > now) add(tomorrow, second, tomorrow.temp);
   return items;
 }

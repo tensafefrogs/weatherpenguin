@@ -27,8 +27,12 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
+# one App Store Connect job at a time, shared with the App Store listing workflow, so two never edit it at once
 concurrency:
-  group: app-store-release
+  group: app-store-connect
   cancel-in-progress: false
 
 jobs:
@@ -79,7 +83,7 @@ jobs:
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
           BUNDLE_ID: ${{ vars.BUNDLE_ID }}
         run: |
-          pip install -q pyjwt cryptography
+          pip install -q pyjwt==2.10.1 cryptography==44.0.0
           cd app/ios/store && python3 check_key.py
 
   build:
@@ -107,7 +111,7 @@ jobs:
       BUNDLE_ID: ${{ vars.BUNDLE_ID }}
     steps:
       - uses: actions/checkout@v5
-      - run: pip install pyjwt cryptography
+      - run: pip install -q pyjwt==2.10.1 cryptography==44.0.0
       - name: TestFlight only (app/ios/beta.json)
         if: needs.plan.outputs.act == 'true' && needs.plan.outputs.beta == 'true'
         run: python3 app/ios/store/release.py beta ${{ needs.build.outputs.build_number && format('--build-number {0}', needs.build.outputs.build_number) || '' }}

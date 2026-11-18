@@ -2,6 +2,7 @@
 reach their phone. Only that one person: nobody else is added. Prints no names or emails.
 Run by the **TestFlight tester** workflow (Actions tab). Safe to run again."""
 import sys
+import urllib.parse
 from asc import ApiError, app as get_app, call, request
 
 GROUP = 'Internal'
@@ -29,7 +30,7 @@ except ApiError as e:
     if e.code != 409:
         sys.exit(f'::error::Could not add the tester ({e.code}).')
     # already a tester of this app (in no group, or a deleted one): put that tester in the group
-    found = call('GET', f'/v1/betaTesters?filter[email]={email}&filter[apps]={app_id}')['data']
+    found = call('GET', f'/v1/betaTesters?filter[email]={urllib.parse.quote(email)}&filter[apps]={app_id}')['data']
     if not found:
         sys.exit('::error::Apple says the tester exists but it could not be found; add them by hand.')
     call('POST', f"/v1/betaGroups/{group['id']}/relationships/betaTesters", {'data': [{'type': 'betaTesters', 'id': found[0]['id']}]})
