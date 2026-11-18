@@ -58,6 +58,9 @@ drawings, widgets and watch): read it before adding anything to a screen.
   the tag in both `CFBundleLocalizations` lists (`app/ios/project.yml`), `app/ios/store/l10n/<locale>.json`, and the
   locale in the screenshots matrix in `.github/workflows/store.yml`. A new script may need the font
   (`web/app/fonts/Inter.woff2` is subset to Latin and Cyrillic; CJK uses the system font).
+- The website's home pages (`web/index.html`, `web/<lang>/index.html`), `sitemap.xml` and `robots.txt` are made by
+  `python3 -I tools/make_site.py` from the App Store text: edit the script or `app/ios/store/`, never the pages, and
+  rerun it when the listing text changes. A new App Store language needs its line in `LANGUAGES` and `LABELS` there.
 - Machine translations ship; a native speaker's read-through is welcome. Weather condition names should match
   Apple's Weather app.
 

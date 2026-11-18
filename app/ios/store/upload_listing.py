@@ -227,7 +227,8 @@ def localizations(info, ver, listing):
     for t in langs:
         loc, l = t['locale'], t['listing']
         a = {'description': l['description'], 'keywords': l['keywords'], 'promotionalText': l['promotional_text'],
-             'supportUrl': v['support_url'], 'marketingUrl': v['marketing_url']}
+             # each language links to its own page on the website (tools/make_site.py), English as the fallback
+             'supportUrl': v['support_url'], 'marketingUrl': l.get('marketing_url') or v['marketing_url']}
         try:
             if loc in have_ver: patch('appStoreVersionLocalizations', have_ver[loc]['id'], a)
             else: request('POST', '/v1/appStoreVersionLocalizations', {'data': {'type': 'appStoreVersionLocalizations', 'attributes': dict(a, locale=loc),

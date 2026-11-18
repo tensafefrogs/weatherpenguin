@@ -212,6 +212,12 @@ every event and how to read it.
 `.github/workflows/pages.yml` publishes `web/` to GitHub Pages on every push to `main` that changes it (and when
 run by hand).
 
+The home page comes in every App Store language (`/`, `/de/`, `/fr/`, `/ja/`, …), made by `python3 -I tools/make_site.py`
+from the App Store text (`app/ios/store/listing.json` and `l10n/*.json`) plus a few labels in the script. Run it after
+changing that text; it also writes `web/sitemap.xml` (each page with its other languages, for Google Search Console:
+submit `https://weatherpenguin.com/sitemap.xml`) and `web/robots.txt`. Each App Store language links to its own page
+(`marketing_url` in `l10n/<locale>.json`).
+
 ### Pointing weatherpenguin.com at GitHub Pages
 
 The domain is registered with **Squarespace Domains** (it was Google Domains), which also hosts its DNS

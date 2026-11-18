@@ -81,6 +81,29 @@ img { max-width: 100%; height: auto; }
   .band-inner { grid-template-columns: 1fr auto; }
 }
 
+/* Home pages: the line under the badge, what it does, the features, the languages */
+.free { margin: 10px 0 0; font: 400 15px/1.4 "Inter", sans-serif; color: var(--soft); }
+.about { max-width: 820px; margin: 0 auto; padding: 36px 20px 8px; }
+.about h2 { font: 400 clamp(32px, 6vw, 44px)/1.1 var(--hand); margin: 28px 0 12px; text-align: center; }
+.about h2:first-child { margin-top: 0; }
+.lead { font-size: 19px; max-width: 640px; margin: 0 auto; text-align: center; }
+.features { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px 28px; }
+.features li { padding-left: 26px; position: relative; }
+.features li::before { content: ""; position: absolute; left: 4px; top: 0.55em; width: 9px; height: 9px;
+  background: #79dbfc; border-radius: 0 5px 5px 5px; transform: rotate(45deg); }
+.features strong { font-weight: 600; display: block; }
+.credit { text-align: center; color: var(--soft); font-size: 15px; margin: 18px 0 0; }
+.languages { list-style: none; padding: 0; margin: 0 auto; max-width: 640px; display: flex; flex-wrap: wrap;
+  justify-content: center; gap: 6px 18px; }
+.languages a[aria-current] { color: var(--ink); text-decoration: none; font-weight: 600; }
+@media (min-width: 760px) { .features { grid-template-columns: 1fr 1fr; } }
+/* the hand lettering is Latin only: other scripts get the plain type, a little smaller */
+:lang(ru) .pitch, :lang(ja) .pitch, :lang(ko) .pitch, :lang(zh-Hans) .pitch, :lang(zh-Hant) .pitch {
+  font: 400 clamp(22px, 4.5vw, 28px)/1.35 "Inter", system-ui, sans-serif; }
+:lang(ru) .about h2, :lang(ja) .about h2, :lang(ko) .about h2, :lang(zh-Hans) .about h2, :lang(zh-Hant) .about h2,
+:lang(ru) .try, :lang(ja) .try, :lang(ko) .try, :lang(zh-Hans) .try, :lang(zh-Hant) .try {
+  font-family: "Inter", system-ui, sans-serif; font-weight: 300; }
+
 .page { max-width: 720px; margin: 0 auto; padding: 8px 20px 40px; }
 .page h1 { font: 400 48px/1.1 var(--hand); margin: 16px 0 8px; }
 .page h2 { font-size: 20px; margin: 28px 0 6px; }
