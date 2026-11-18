@@ -1,4 +1,4 @@
-# Releases the iOS app from app/ios/release.json, so a release is a commit (by a person or by Claude) rather than clicks in
+# Releases the iOS app from app/ios/release.json, so a release is a commit (by a person or a coding agent) rather than clicks in
 # App Store Connect. Adapted from tensafefrogs/king-walk.
 #
 # App Store Connect. When app/ios/release.json changes on main:

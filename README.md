@@ -63,7 +63,7 @@ In this order (each step needs the one before):
 1. **API key:** App Store Connect → Users and Access → Integrations → App Store Connect API → Team Keys →
    generate a key with the **Admin** role (so the build can make its own signing certificate and profiles).
    Download the `.p8` (only once); note the Key ID and the Issuer ID.
-2. **GitHub** → this repo → Settings → Secrets and variables → Actions (Claude can't set these; the owner does):
+2. **GitHub** → this repo → Settings → Secrets and variables → Actions (the owner sets these; agents can't):
 
    | Secret | Value |
    | --- | --- |
@@ -248,7 +248,7 @@ The domain is registered with **Squarespace Domains** (it was Google Domains), w
 Check it: `dig +short weatherpenguin.com` shows the four `185.199.x.153` addresses and `dig +short www.weatherpenguin.com`
 shows `tensafefrogs.github.io`. The App Store listing's privacy and support links need this live before review.
 
-Without `dig` (Claude's container): `curl -s "https://dns.google/resolve?name=weatherpenguin.com&type=A&edns_client_subnet=1.2.3.0/24"`.
+Without `dig` (an agent's container): `curl -s "https://dns.google/resolve?name=weatherpenguin.com&type=A&edns_client_subnet=1.2.3.0/24"`.
 Ask with a few different `edns_client_subnet` values: one cache can still hold the old record for up to its TTL
 (4 hours for the DreamHost one), and GitHub's "Domain does not resolve to the GitHub Pages server" check can see
 that stale copy. If GitHub complains while the records are right, wait out the TTL, then remove and re-add the

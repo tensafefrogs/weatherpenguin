@@ -1,2 +1,7 @@
 /app/ios/store/screenshots/l10n/
 node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+/app/ios/build/
+/app/ios/*.xcodeproj/
