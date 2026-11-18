@@ -17,6 +17,8 @@ final class AppModel: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
     super.init()
     // A new install takes the bands and °C/°F from iCloud; later changes on another device arrive here.
     Settings.pullFromCloud(onlyIfEmpty: true)
+    // An update from 1.3: its settings were only on this phone; the widgets and watch read them from iCloud.
+    Settings.pushToCloudIfMissing()
     NotificationCenter.default.addObserver(
       forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification, object: NSUbiquitousKeyValueStore.default, queue: .main
     ) { [weak self] _ in
@@ -63,7 +65,13 @@ final class AppModel: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         send("onWeather", payload)
         WidgetCenter.shared.reloadAllTimelines() // the Home Screen widgets follow the app's fresh forecast
       } catch let error as LocationProvider.Failure {
-        send("onError", ["code": error == .denied ? "locationDenied" : "locationFailed"])
+        if error == .denied {
+          // denied for this app, or Location Services off for the whole phone (checked off the main thread)
+          let servicesOn = await Task.detached { CLLocationManager.locationServicesEnabled() }.value
+          send("onError", ["code": servicesOn ? "locationDenied" : "locationOff"])
+        } else {
+          send("onError", ["code": "locationFailed"])
+        }
       } catch {
         // Apple's error domain and number, shown small under the message so a tester can report it
         let ns = error as NSError
@@ -120,7 +128,9 @@ final class AppModel: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
   func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction) async -> WKNavigationActionPolicy {
     guard let url = action.request.url else { return .cancel }
     if url.scheme == BundleSchemeHandler.scheme { return .allow }
-    if url.scheme == "https" { await UIApplication.shared.open(url) }
+    if url.scheme == "https", action.navigationType == .linkActivated, action.targetFrame?.isMainFrame != false {
+      await UIApplication.shared.open(url)
+    }
     return .cancel
   }
 

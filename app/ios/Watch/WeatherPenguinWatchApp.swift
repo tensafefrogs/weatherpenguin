@@ -3,7 +3,8 @@ import WidgetKit
 
 /// The Apple Watch app: Today and Tomorrow, one above the other (turn the Digital Crown or swipe up).
 /// Gets its own location and WeatherKit forecast, and reads the temperature bands and °C/°F the iPhone app
-/// keeps in iCloud. Launch arguments for screenshots: -sample 1 (fixed weather), -page 1 (start on Tomorrow).
+/// keeps in iCloud. Launch arguments for screenshots, in debug builds only: -sample 1 (fixed weather), -page 1 (start on
+/// Tomorrow).
 @main
 struct WeatherPenguinWatchApp: App {
   @StateObject private var model = WatchModel()
@@ -27,8 +28,16 @@ final class WatchModel: ObservableObject {
   @Published var settings = PenguinSettings.current()
   private let location = OneShotLocation()
   private var lastLoaded: Date?
+  private var loading = false
 
-  var isSample: Bool { UserDefaults.standard.bool(forKey: "sample") }
+  /// Screenshots only (the Watch screenshots workflow builds Debug): -sample 1 shows fixed weather.
+  var isSample: Bool {
+    #if DEBUG
+    UserDefaults.standard.bool(forKey: "sample")
+    #else
+    false
+    #endif
+  }
 
   func refreshIfStale() async {
     if let lastLoaded, Date().timeIntervalSince(lastLoaded) < 10 * 60 { return }
@@ -36,6 +45,9 @@ final class WatchModel: ObservableObject {
   }
 
   func refresh() async {
+    guard !loading else { return }   // at launch, the first appearance and becoming active both ask
+    loading = true
+    defer { loading = false }
     settings = PenguinSettings.current()
     if isSample {
       state = .ready(PenguinWeather.sample(settings: settings))

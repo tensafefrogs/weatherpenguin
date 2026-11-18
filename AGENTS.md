@@ -28,8 +28,9 @@ drawings, widgets and watch): read it before adding anything to a screen.
   only (`tools/make_stickers.py` for the stickers).
 - The repository is public: code under MIT, the name and all artwork © EEG LLC (README, "License"). Never commit
   keys, tokens, personal details or build output; secrets live only in Actions secrets and variables. The original
-  source art and the pre-2.0 code are in the owner's private `weatherpenguin-archive` repository, not here. Forks'
-  pull requests run the Web tests without secrets; keep it that way (no `pull_request_target`, no secrets in PR jobs).
+  source art and the pre-2.0 code are in the owner's private `weatherpenguin-archive` repository, not here. Pull requests
+  (forks' too) run the Web tests and the iOS simulator build, without secrets and with a read-only token; keep it that
+  way (no `pull_request_target`, no secrets in PR jobs; workflows default to `contents: read`).
 - The page talks to the app through `web/app/bridge.js` (message list there); keep the page working in a plain
   browser, where there's no app.
 - Outfit and rain rules are v1.3's (`web/app/rules.js`); settings use v1.3's UserDefaults keys
@@ -67,7 +68,10 @@ where the app stands. **Never submit for App Review or release to the App Store 
 that version**, and say exactly what will happen. After changes to what's on screen, regenerate the store
 screenshots (`node app/ios/store/screenshots.js`) in the same change and look at them. When the change is
 noticeable, re-record the trailers and app preview (`node tools/trailer.js`, `--vertical`, `--preview`) and the
-App Review video (the **Review video** workflow), and watch them.
+App Review video (the **Review video** workflow), and watch them. Screenshots and videos a workflow commits don't
+start the **App Store listing** workflow (pushes made with the workflow's token never trigger others): run it by
+hand afterwards. It and the **App Store release** workflow share one concurrency group, so they never edit App Store
+Connect at once.
 
 ## Apple, GitHub and this container: what tripped things up before
 

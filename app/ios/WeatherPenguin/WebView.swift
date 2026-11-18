@@ -72,7 +72,7 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
       return task.didFailWithError(URLError(.badURL))
     }
     let file = root.appendingPathComponent(url.path).standardizedFileURL
-    guard file.path.hasPrefix(root.standardizedFileURL.path), let data = try? Data(contentsOf: file) else {
+    guard file.path.hasPrefix(root.standardizedFileURL.path + "/"), let data = try? Data(contentsOf: file) else {
       return task.didFailWithError(URLError(.fileDoesNotExist))
     }
     let type = Self.types[file.pathExtension.lowercased()] ?? "application/octet-stream"

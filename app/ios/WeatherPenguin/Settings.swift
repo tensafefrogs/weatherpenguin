@@ -90,6 +90,21 @@ enum Settings {
     return v
   }
 
+  /// Copies this device's stored settings to iCloud when iCloud has none: an update from 1.3, whose settings were only
+  /// ever on this phone. The widgets and the watch read iCloud, so without this they'd use the defaults until the
+  /// person next taps Done in Settings.
+  static func pushToCloudIfMissing() {
+    let d = UserDefaults.standard
+    let stored = Bundle.main.bundleIdentifier.flatMap { d.persistentDomain(forName: $0) } ?? [:]
+    var pushed = false
+    for key in synced where cloud.object(forKey: key) == nil {
+      guard let value = stored[key] else { continue }
+      cloud.set(value, forKey: key)
+      pushed = true
+    }
+    if pushed { cloud.synchronize() }
+  }
+
   /// Takes iCloud's copy when another device changed it, or on a new install that has none of its own.
   /// Returns whether anything changed here.
   @discardableResult

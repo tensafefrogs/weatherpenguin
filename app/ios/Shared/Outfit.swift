@@ -68,7 +68,8 @@ struct PenguinSettings: Codable, Equatable {
   /// formatTemp in rules.js: whole °F, or °C to one decimal in the user's number format.
   func format(_ tempC: Double?) -> String {
     guard let c = tempC else { return "" }
-    if !celsius { return String(Int((c * 9 / 5 + 32).rounded())) }
-    return c.formatted(.number.precision(.fractionLength(1)).grouping(.never))
+    // the same rounding as formatTemp: Math.round goes half up (-8.5 → -8), Intl.NumberFormat half away from zero
+    if !celsius { return String(Int((c * 9 / 5 + 32 + 0.5).rounded(.down))) }
+    return c.formatted(.number.precision(.fractionLength(1)).rounded(rule: .toNearestOrAwayFromZero).grouping(.never))
   }
 }

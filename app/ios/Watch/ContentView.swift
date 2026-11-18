@@ -2,7 +2,11 @@ import SwiftUI
 
 struct ContentView: View {
   @ObservedObject var model: WatchModel
-  @State private var page = UserDefaults.standard.integer(forKey: "page")
+  #if DEBUG
+  @State private var page = UserDefaults.standard.integer(forKey: "page")   // -page 1 for screenshots
+  #else
+  @State private var page = 0
+  #endif
 
   var body: some View {
     Group {
