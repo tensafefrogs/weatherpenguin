@@ -52,7 +52,9 @@ struct WidgetSheet: View {
           // (the plain penguin before a forecast is the first sheet's job no more: room for the Lock Screen)
           tile(medium, rain: false) { MediumPenguinView(day: dry.tomorrow, settings: settings, header: AnyView(DaySwitch(tomorrow: true))) }
           tile(medium, rain: false) { TwoDayPenguinView(forecast: dry, settings: settings) }
-          lockScreen(rainy.today)
+          // the Lock Screen on a cold day: the longest advice ("Bundle up: sweater, scarf and hat."), to check it fits
+          lockScreen(DaySummary(temp: 4.4, high: 6, low: -1, outfit: Outfit.pick(tempC: 4.4, rain: false, settings: settings),
+                                rain: false, condition: String(localized: "Clear"), rainyCondition: false))
         }
       }
       .padding(.top, 70)

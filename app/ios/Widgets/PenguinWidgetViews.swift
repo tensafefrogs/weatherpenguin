@@ -194,8 +194,10 @@ struct LockScreenPenguinView: View {
       HStack(spacing: 6) {
         PenguinPicture(outfit: outfit)
         VStack(alignment: .leading, spacing: 0) {
-          Text(temp).font(.system(size: 24, weight: .light))
-          Text(outfit.advice).font(.system(size: 13)).lineLimit(2).minimumScaleFactor(0.8)
+          // the number a little smaller than in the app's widgets, so the advice gets three lines: "Bundle up: sweater,
+          // scarf and hat." (and longer translations) cut off at two
+          Text(temp).font(.system(size: 20, weight: .light))
+          Text(outfit.advice).font(.system(size: 12.5)).lineLimit(3).minimumScaleFactor(0.75).allowsTightening(true)
         }
         Spacer(minLength: 0)
       }
