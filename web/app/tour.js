@@ -5,8 +5,21 @@ const $ = (id) => document.getElementById(id);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Scrolled frame by frame, with snapping off meanwhile: WebKit ignores a smooth scrollTo on a snapping scroller.
+// TEMPORARY readout (one Review video run, then removed): what the web view does with the scroll
+const readout = (() => {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;left:8px;right:8px;top:120px;z-index:99;background:#000;color:#0f0;font:14px monospace;padding:6px;white-space:pre';
+  document.body.append(d);
+  const t0 = performance.now();
+  return (msg) => {
+    const p = $('pages');
+    d.textContent = `${((performance.now() - t0) / 1000).toFixed(2)}s ${msg}\nscrollLeft=${p.scrollLeft} client=${p.clientWidth} scrollW=${p.scrollWidth} pages=${p.children.length}\nsnap=${getComputedStyle(p).scrollSnapType} overflowX=${getComputedStyle(p).overflowX}`;
+  };
+})();
+
 async function swipeTo(page) {
   const pages = $('pages');
+  readout(`swipe to ${page} start`);
   const from = pages.scrollLeft;
   const to = page * pages.clientWidth;
   pages.style.scrollSnapType = 'none';
@@ -15,6 +28,7 @@ async function swipeTo(page) {
     const step = (now) => {
       const t = Math.min(1, (now - start) / 600);
       pages.scrollLeft = from + (to - from) * (1 - (1 - t) ** 3);
+      readout(`swipe to ${page} t=${t.toFixed(2)}`);
       if (t < 1) requestAnimationFrame(step);
       else done();
     };
@@ -35,7 +49,9 @@ async function slide(input, to) {
 }
 
 export async function runTour() {
+  readout('tour start');
   await wait(3500);
+  readout('after first wait');
   await swipeTo(1);
   await swipeTo(0);
   $('gear').click();
