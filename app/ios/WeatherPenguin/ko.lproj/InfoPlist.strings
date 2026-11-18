@@ -1,0 +1,2 @@
+"CFBundleDisplayName" = "Weather Penguin";
+"NSLocationWhenInUseUsageDescription" = "Weather Penguin은 현재 위치의 날씨를 확인하기 위해 위치 정보를 사용합니다.";

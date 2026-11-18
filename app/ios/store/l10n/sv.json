@@ -1,0 +1,10 @@
+{
+  "locale": "sv",
+  "listing": {
+    "name": "Weather Penguin",
+    "subtitle": "Vad ska du ha på dig idag?",
+    "promotional_text": "En handritad pingvin kollar väderprognosen och klär sig efter den. Tröja, regnrock eller bikini: en blick och du vet vad du ska ha på dig.",
+    "description": "Weather Penguin visar vad du ska ha på dig idag, med en blick.\n\nÖppna appen så är en handritad pingvin redan klädd för vädret där du är: tröja och halsduk när det är kallt, jacka när det är svalt, T-shirt när det är varmt och bikini när det är hett. När det blir regn åker regnrocken, ponchon eller badmössan fram.\n\n• Idag och imorgon: svep för att se vad pingvinen har på sig imorgon\n• Dina temperaturer: välj när pingvinen byter från tröja till jacka till T-shirt\n• Morgonpingvin: en notis varje morgon om vad du ska ha på dig, om du vill\n• Widgetar för hemskärmen och låsskärmen\n• Fråga Siri vad du ska ha på dig\n• En Apple Watch-app och komplikationer till urtavlan\n• °F eller °C\n• iMessage-stickers med alla kläder\n• Dina inställningar följer med till dina andra enheter via iCloud\n• Inget konto, ingen reklam, ingen spårning\n\nVäderdata från Apple Weather.",
+    "keywords": "väder,prognos,kläder,outfit,klädsel,regn,temperatur,söt,paraply,jacka,kallt,soligt,pingvin"
+  }
+}

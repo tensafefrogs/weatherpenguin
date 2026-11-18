@@ -1,0 +1,111 @@
+# Builds the iOS app on a GitHub macOS runner. No Mac needed. Adapted from tensafefrogs/king-walk.
+# - On pushes that change the app or its web UI: a simulator build, to check it compiles (no signing, no secrets).
+#   macOS minutes count 10x against the GitHub plan, so it runs only for those changes.
+# - Run it by hand (Actions → iOS → Run workflow, Upload checked) to build, sign and upload to TestFlight.
+# - The App Store release workflow (release.yml) calls it to build and upload too.
+# Secrets and variables: README.md, "Releasing".
+name: iOS
+on:
+  push:
+    paths: ['app/ios/**', 'web/app/**', '.github/workflows/ios.yml', '!app/ios/store/**', '!app/ios/release.json', '!app/ios/beta.json']
+  pull_request:
+    paths: ['app/ios/**', 'web/app/**', '.github/workflows/ios.yml']
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: Upload to TestFlight
+        type: boolean
+        default: false
+      xcode27:
+        description: Build with Xcode 27.1 (iPhone Duo fold support; runs on GitHub's xcode-27 preview machines)
+        type: boolean
+        default: true
+  workflow_call:
+    inputs:
+      upload: {type: boolean, default: true}
+      xcode27: {type: boolean, default: true}
+      version: {type: string, default: '', description: 'App version (CFBundleShortVersionString); empty keeps project.yml''s'}
+    outputs:
+      build_number:
+        description: The uploaded build's number
+        value: ${{ jobs.build.outputs.build_number }}
+
+# bash with pipefail, so a failed build isn't hidden by a pipe
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    # Xcode 27.1 is only on GitHub's xcode-27 preview machines, used when asked (inputs are empty on a push, so a
+    # push builds on macos-26, without the fold code). As in tensafefrogs/king-walk.
+    runs-on: ${{ inputs.xcode27 && 'xcode-27' || 'macos-26' }}
+    timeout-minutes: 30
+    outputs:
+      build_number: ${{ steps.number.outputs.build_number }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Pick Xcode
+        # iPhone Duo needs Xcode 27.1: with an older SDK the app runs in a phone-sized frame on the inner screen and
+        # the fold API isn't there. WEATHERPENGUIN_SDK_27_1 turns on the fold code in AppModel.swift.
+        env:
+          WANT_27: ${{ inputs.xcode27 }}
+        run: |
+          x=""
+          for c in /Applications/Xcode_27.1.app /Applications/Xcode_27.1.0.app /Applications/Xcode_27.1_Release_Candidate.app; do
+            [ -d "$c" ] && { x=$c; break; }
+          done
+          if [ -n "$x" ]; then
+            sudo xcode-select -s "$x"
+            echo 'SWIFT_FLAGS=WEATHERPENGUIN_SDK_27_1' >> "$GITHUB_ENV"
+          elif [ "$WANT_27" = true ]; then
+            echo "::error::Xcode 27.1 isn't on this runner"; ls -d /Applications/Xcode*.app; exit 1
+          else
+            latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)
+            sudo xcode-select -s "$latest"
+            echo "::notice::Building with $(xcodebuild -version | head -1), without the iPhone Duo fold code"
+          fi
+      - name: Write the app's config (web/app/config.js) from the Actions variables
+        env:
+          GOATCOUNTER_URL: ${{ vars.GOATCOUNTER_URL }}
+        run: |
+          python3 -c "import json, os; open('web/app/config.js', 'w').write('window.WP_CONFIG = ' + json.dumps({'goatcounter': os.environ.get('GOATCOUNTER_URL', '').strip()}) + ';\n')"
+      - name: Install XcodeGen and generate the project
+        run: |
+          brew install xcodegen
+          xcodebuild -version
+          cd app/ios && xcodegen generate
+      - name: Build for the simulator
+        if: ${{ !inputs.upload }}
+        run: |
+          xcodebuild build -project app/ios/WeatherPenguin.xcodeproj -scheme WeatherPenguin -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO \
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS="\$(inherited) ${SWIFT_FLAGS:-}" > build.log 2>&1 \
+            || { grep -E 'error:' build.log | sort -u | head -40; tail -60 build.log; exit 1; }
+          tail -3 build.log
+          echo '--- warnings'; grep -i 'warning:' build.log | sort -u | head -30 || true
+      - name: Build the Apple Watch app for the simulator
+        # its own scheme, so its compile errors can't hide behind the iPhone build
+        if: ${{ !inputs.upload }}
+        run: |
+          xcodebuild build -project app/ios/WeatherPenguin.xcodeproj -scheme WeatherPenguinWatch -configuration Debug \
+            -destination 'generic/platform=watchOS Simulator' CODE_SIGNING_ALLOWED=NO > watch.log 2>&1 \
+            || { grep -E 'error:' watch.log | sort -u | head -40; tail -60 watch.log; exit 1; }
+          tail -3 watch.log
+          echo '--- warnings'; grep -i 'warning:' watch.log | grep -v appintentsmetadataprocessor | sort -u | head -30 || true
+      - name: Build number
+        id: number
+        # the UTC date and time, so it always goes up whichever workflow builds it (Apple needs each upload higher)
+        run: echo "build_number=$(date -u +%y%m%d%H%M)" >> "$GITHUB_OUTPUT"
+      - name: Archive, sign and upload to TestFlight
+        if: ${{ inputs.upload }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID || vars.APPLE_TEAM_ID }}
+          BUNDLE_ID: ${{ vars.BUNDLE_ID }}
+          BUILD_NUMBER: ${{ steps.number.outputs.build_number }}
+          MARKETING_VERSION: ${{ inputs.version }}
+          ARCHIVE_SIGNING: ${{ vars.ARCHIVE_SIGNING }}
+        run: app/ios/scripts/upload.sh

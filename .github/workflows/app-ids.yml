@@ -1,0 +1,20 @@
+# Registers the app's four App IDs (app, stickers, Watch app, complications) and turns on WeatherKit and iCloud,
+# with the App Store Connect key. Run by hand from the Actions tab; safe to run again. app/ios/store/app_ids.py.
+name: App IDs
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ids:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID || vars.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID || vars.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+      BUNDLE_ID: ${{ vars.BUNDLE_ID }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: pip install -q pyjwt cryptography
+      - run: cd app/ios/store && python3 app_ids.py

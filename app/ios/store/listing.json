@@ -1,0 +1,83 @@
+{
+  "app_info": {
+    "name": "Weather Penguin",
+    "subtitle": "What to wear today",
+    "privacy_policy_url": "https://weatherpenguin.com/privacy.html",
+    "category": "WEATHER",
+    "subcategories": [],
+    "secondary_category": "LIFESTYLE",
+    "content_rights": "USES_THIRD_PARTY_CONTENT"
+  },
+  "version": {
+    "copyright": "2026 EEG LLC",
+    "promotional_text": "A hand-drawn penguin checks the forecast and dresses for it. Sweater, raincoat or bikini: one look and you know what to wear.",
+    "description": "Weather Penguin tells you what to wear today, at a glance.\n\nOpen the app and a hand-drawn penguin is already dressed for the weather where you are: a sweater and scarf when it's cold, a jacket when it's cool, a T-shirt when it's warm and a bikini when it's hot. When rain is on the way, out come the raincoat, the poncho or the swim cap.\n\n• Today and tomorrow: swipe to see what the penguin will wear tomorrow\n• Your temperatures: choose when the penguin switches from sweater to jacket to T-shirt\n• Morning penguin: an optional notification each morning with what to wear\n• Widgets for your Home Screen and Lock Screen\n• Ask Siri what to wear\n• An Apple Watch app and watch face complications\n• °F or °C\n• iMessage stickers of every outfit\n• Your settings follow you to your other devices with iCloud\n• No account, no ads, no tracking\n\nWeather data from Apple Weather.",
+    "keywords": "forecast,what to wear,outfit,clothes,rain,temperature,cute,umbrella,jacket,cold,sunny,daily",
+    "support_url": "https://weatherpenguin.com/support.html",
+    "marketing_url": "https://weatherpenguin.com/"
+  },
+  "age_rating": {},
+  "review_notes": "Weather Penguin shows a hand-drawn penguin dressed for the weather where the user is, today and tomorrow. No account, no login, no in-app purchases, no ads, no user-generated content, no chat. A video of the app in use is attached (sample weather, on simulators).\n\nPURPOSE AND AUDIENCE\nFor anyone deciding what to wear when they go out, children included: one look at the penguin answers \"what should I wear today?\" without reading a forecast. Weather Penguin has been on the App Store since 2013 (version 1.3); 2.0 is a rebuild with the same drawings, the same rules and the same settings.\n\nHOW TO USE IT (no setup needed)\n- Launch the app and allow location (While Using the App). The penguin for today appears, with the temperature, the high or low, the condition and, when rain is coming, a raincoat and falling rain.\n- Swipe left for tomorrow. On iPad and in landscape, today and tomorrow are side by side.\n- The gear (top right) opens Settings: one slider with three handles sets the temperatures where the penguin changes into a jacket, a T-shirt and a bikini; F or C; and Morning penguin, off by default (a local notification at a time the user picks, with what to wear and the day's drawing).\n- If location is declined, the app says so and has a button that opens its page in the Settings app.\n- Widgets: Home Screen (small and medium) and Lock Screen (circular, rectangular, inline). Each asks for location once.\n- Siri and Shortcuts: \"What should I wear in Weather Penguin\" answers with the advice and shows the penguin.\n- Apple Watch: today and tomorrow (turn the Digital Crown), and watch face complications.\n- iMessage: a sticker pack of the eight penguins.\n\nWHAT THE APP ADDS ON iOS\nThe main screen is drawn with HTML bundled inside the app; no website is loaded and nothing depends on our servers. Around it the app is native: location, the forecast from Apple WeatherKit, Home Screen and Lock Screen widgets, the Apple Watch app and complications, a Siri and Shortcuts action (App Intents), local notifications with a picture, iCloud sync of settings between the user's devices, Dynamic Type, and layouts for iPad, Split View and iPhone Duo. weatherpenguin.com has only a demo with sample weather.\n\nEXTERNAL SERVICES\nApple WeatherKit for the forecast (the Apple Weather mark is on the main screen and links to Apple's data sources page; Settings shows it too), Apple's geocoder for the city name, and iCloud key-value storage for settings. Anonymous usage counts go to GoatCounter: no personal data, no identifiers, no location, no cookies. Not tracking (App Privacy: Coarse Location and Product Interaction, not linked to the user).\n\nREGIONS\nWorks wherever Apple Weather has forecasts, in 17 languages that follow the device's language; F or C follows the device's setting.\n\nREGULATION AND THIRD-PARTY MATERIAL\nNot a regulated industry and not a medical or safety app. Weather data: Apple Weather. The penguin drawings and the icon are original, hand-drawn for the app. Font: Inter (SIL Open Font License).",
+  "screenshots": {
+    "APP_IPHONE_67": [
+      "screenshots/iphone-1.png",
+      "screenshots/iphone-2.png",
+      "screenshots/iphone-3.png",
+      "screenshots/iphone-4.png",
+      "screenshots/iphone-5.png"
+    ],
+    "APP_IPAD_PRO_3GEN_129": [
+      "screenshots/ipad-1.png",
+      "screenshots/ipad-2.png",
+      "screenshots/ipad-3.png",
+      "screenshots/ipad-4.png"
+    ],
+    "APP_IPHONE_DUO": [
+      "screenshots/duo-1.png",
+      "screenshots/duo-2.png",
+      "screenshots/duo-3.png"
+    ],
+    "APP_WATCH_ULTRA": [
+      "screenshots/watch-1.png",
+      "screenshots/watch-2.png"
+    ]
+  },
+  "accessibility": {
+    "_comment": "Accessibility Nutrition Labels, per device. Uploaded as a draft; set publish to true once checked on a phone.",
+    "publish": false,
+    "devices": [
+      "IPHONE",
+      "IPAD"
+    ],
+    "supports": {
+      "supportsVoiceover": true,
+      "supportsVoiceControl": true,
+      "supportsLargerText": true,
+      "supportsDarkInterface": false,
+      "supportsDifferentiateWithoutColorAlone": true,
+      "supportsSufficientContrast": true,
+      "supportsReducedMotion": true,
+      "supportsCaptions": false,
+      "supportsAudioDescriptions": false
+    }
+  },
+  "review_attachment": "review-video.mp4",
+  "creative": [
+    {
+      "name": "Weather Penguin preview (iPhone, 886x1920)",
+      "file": "previews/iphone-1.mp4",
+      "kind": "video",
+      "category": "APP_SCREENSHOTS_AND_PREVIEWS",
+      "placements": [
+        [
+          "APP_PREVIEW",
+          "IPHONE_DYNAMIC_ISLAND_LARGE_PROFILE"
+        ],
+        [
+          "APP_PREVIEW",
+          "IPHONE_DUO_PROFILE"
+        ]
+      ]
+    }
+  ]
+}

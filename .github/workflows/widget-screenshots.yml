@@ -1,0 +1,71 @@
+# Home Screen widget screenshots: builds the WidgetPreview app (app/ios/WidgetPreview, not shipped), which lays
+# the real widget views out at their Home Screen sizes with sample forecasts, runs it on an iPhone simulator and
+# commits the pictures to docs/widgets-<n>.png. Run by hand after changing the widgets.
+name: Widget screenshots
+on:
+  workflow_dispatch:
+    inputs:
+      lang:
+        description: Language (an .lproj name like de, ja, zh-Hans)
+        default: en
+      celsius:
+        description: Temperatures in °C
+        type: boolean
+        default: false
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: write   # to commit the pictures
+jobs:
+  shots:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the preview app for the simulator
+        run: |
+          brew install xcodegen
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
+          cd app/ios && xcodegen generate
+          xcodebuild build -project WeatherPenguin.xcodeproj -scheme WidgetPreview -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO > build.log 2>&1 \
+            || { grep -E 'error:' build.log | sort -u | head -40; tail -40 build.log; exit 1; }
+          find build -name 'WidgetPreview.app' -path '*iphonesimulator*' | head -1 > ../../app-path.txt
+      - name: Run it on an iPhone simulator and take the screenshots
+        env:
+          LANG_ARG: ${{ inputs.lang }}
+          CELSIUS: ${{ inputs.celsius }}
+        run: |
+          runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='iOS' and x['isAvailable']]; print(r[-1]['identifier'])")
+          devtype=$(xcrun simctl list devicetypes -j | python3 -c "import json,sys; d=[x for x in json.load(sys.stdin)['devicetypes'] if x['name'].startswith('iPhone') and 'Pro' in x['name'] and 'Max' not in x['name']]; print(d[-1]['identifier'])")
+          echo "runtime $runtime, device $devtype"
+          udid=$(xcrun simctl create shots "$devtype" "$runtime")
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl status_bar "$udid" override --time 9:41 || true
+          xcrun simctl install "$udid" "app/ios/$(cat app-path.txt)"
+          mkdir -p shots
+          for page in 0 1; do
+            xcrun simctl terminate "$udid" com.weatherpenguin.WidgetPreview 2>/dev/null || true
+            xcrun simctl launch "$udid" com.weatherpenguin.WidgetPreview -page $page -celsius "$CELSIUS" -AppleLanguages "($LANG_ARG)"
+            sleep 6
+            xcrun simctl io "$udid" screenshot "shots/widgets-$((page + 1)).png"
+          done
+          ls -la shots
+      - uses: actions/upload-artifact@v4
+        with:
+          name: widget-screenshots-${{ inputs.lang }}
+          path: shots/*.png
+      - name: Commit the English screenshots
+        if: inputs.lang == 'en'
+        run: |
+          cp shots/widgets-*.png docs/
+          git config user.name 'Widget screenshots'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add docs/widgets-*.png
+          echo '--- files the build changed (should be none besides the screenshots)'; git status --short
+          git diff --cached --quiet && exit 0
+          git commit -q -m 'Widget screenshots'
+          for i in 1 2 3; do git pull --rebase --autostash -q && git push -q && exit 0; sleep 5; done
+          exit 1

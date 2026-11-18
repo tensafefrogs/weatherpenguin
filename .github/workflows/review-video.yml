@@ -1,0 +1,101 @@
+# The App Review video (App Review Information > Attachment): what the app does, recorded on simulators, because
+# App Review has asked our other apps for a screen recording under guideline 2.1. Builds the app, WidgetPreview and
+# the Watch app (debug, simulator), then records: the app with sample weather playing its tour (launch arguments
+# -sample rainLater -tour true; web/app/tour.js), the widgets sheet, and the Watch app's Today and Tomorrow. Joins
+# them into app/ios/store/review-video.mp4 and commits it; upload_listing.py attaches it (listing.json
+# "review_attachment"). Run by hand when what the app shows changes.
+name: Review video
+on:
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: write
+jobs:
+  video:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the app, WidgetPreview and the Watch app for the simulator
+        run: |
+          brew install xcodegen ffmpeg
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
+          cd app/ios && xcodegen generate
+          for pair in WeatherPenguin:iOS WidgetPreview:iOS WeatherPenguinWatch:watchOS; do
+            scheme=${pair%%:*}; platform=${pair#*:}
+            xcodebuild build -project WeatherPenguin.xcodeproj -scheme "$scheme" -configuration Debug \
+              -destination "generic/platform=$platform Simulator" -derivedDataPath build CODE_SIGNING_ALLOWED=NO > "$scheme.log" 2>&1 \
+              || { grep -E 'error:' "$scheme.log" | sort -u | head -40; tail -40 "$scheme.log"; exit 1; }
+          done
+          find build -name '*.app' -path '*simulator*' -maxdepth 6 | sort
+      - name: Record
+        run: |
+          set -x
+          cd app/ios
+          app=$(find build -name 'WeatherPenguin.app' -path '*iphonesimulator*' | head -1)
+          preview=$(find build -name 'WidgetPreview.app' -path '*iphonesimulator*' | head -1)
+          watchapp=$(find build -name 'WeatherPenguinWatch.app' -path '*watchsimulator*' | head -1)
+          pick() {  # newest runtime for a platform, newest device type matching a pattern
+            runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='$1' and x['isAvailable']]; print(r[-1]['identifier'])")
+            devtype=$(xcrun simctl list devicetypes -j | python3 -c "import json,sys,re; d=[(int(m.group(1)),x['identifier']) for x in json.load(sys.stdin)['devicetypes'] for m in [re.fullmatch(r'$2', x['name'])] if m]; print(max(d)[1])")
+            xcrun simctl create "$3" "$devtype" "$runtime"
+          }
+          phone=$(pick iOS 'iPhone (\d+) Pro Max' phone)
+          wruntime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='watchOS' and x['isAvailable']]; print(r[-1]['identifier'])")
+          wtype=$(xcrun simctl list devicetypes -j | python3 -c "import json,sys; d=[x for x in json.load(sys.stdin)['devicetypes'] if 'Ultra' in x['name'] and 'Watch' in x['name']]; print(d[-1]['identifier'])")
+          watch=$(xcrun simctl create watch "$wtype" "$wruntime")
+          for d in $phone $watch; do xcrun simctl boot "$d"; xcrun simctl bootstatus "$d" -b; done
+          xcrun simctl status_bar "$phone" override --time 9:41 --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
+          xcrun simctl status_bar "$watch" override --time 9:41 || true
+          xcrun simctl install "$phone" "$app"; xcrun simctl install "$phone" "$preview"; xcrun simctl install "$watch" "$watchapp"
+          sleep 30   # boot banners (Apple Intelligence) pass before recording
+          mkdir -p clips
+          record() {  # device, file, seconds, then the launch command
+            local dev=$1 file=$2 secs=$3; shift 3
+            xcrun simctl io "$dev" recordVideo --codec=h264 --force "clips/$file" & local rec=$!
+            sleep 2; "$@"; sleep "$secs"
+            kill -INT $rec; wait $rec || true
+          }
+          # The simulator records only when the screen changes, so a still screen is a screenshot held for a while.
+          record "$phone" 1-app.mov 26 xcrun simctl launch "$phone" com.weatherpenguin.WeatherPenguin -sample rainLater -tour true
+          xcrun simctl terminate "$phone" com.weatherpenguin.WeatherPenguin || true
+          xcrun simctl launch "$phone" com.weatherpenguin.WidgetPreview -page 2 -celsius false; sleep 6
+          xcrun simctl io "$phone" screenshot clips/2-widgets.png
+          for page in 0 1; do
+            xcrun simctl terminate "$watch" com.weatherpenguin.WeatherPenguin.watchkitapp 2>/dev/null || true
+            xcrun simctl launch "$watch" com.weatherpenguin.WeatherPenguin.watchkitapp -sample 1 -page $page; sleep 8
+            xcrun simctl io "$watch" screenshot "clips/$((page + 3))-watch.png"
+          done
+          ls -la clips
+      - name: Join the clips (1080 x 1920, on Sky)
+        run: |
+          cd app/ios
+          args=(); filters=''; n=0
+          for f in clips/*; do
+            case $f in
+              *.mov) args+=(-ss 2 -i "$f"); hold=2 ;;               # from the launch; hold the last frame 2 s
+              *widgets.png) args+=(-loop 1 -t 6 -i "$f"); hold=0 ;;
+              *.png) args+=(-loop 1 -t 4 -i "$f"); hold=0 ;;
+            esac
+            filters+="[$n:v]scale=1080:1840:force_original_aspect_ratio=decrease,fps=30,tpad=stop_mode=clone:stop_duration=$hold,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0xd8e2ff,setsar=1[v$n];"
+            n=$((n + 1))
+          done
+          for i in $(seq 0 $((n - 1))); do filters+="[v$i]"; done
+          ffmpeg -y "${args[@]}" -filter_complex "${filters}concat=n=$n:v=1:a=0[out]" -map '[out]' \
+            -c:v libx264 -pix_fmt yuv420p -crf 26 -preset slow -movflags +faststart store/review-video.mp4
+          ls -la store/review-video.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: review-video
+          path: app/ios/store/review-video.mp4
+      - name: Commit it
+        run: |
+          git config user.name 'Review video'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add app/ios/store/review-video.mp4
+          git diff --cached --quiet && exit 0
+          git commit -q -m 'App Review video'
+          for i in 1 2 3; do git pull --rebase --autostash -q && git push -q && exit 0; sleep 5; done
+          exit 1

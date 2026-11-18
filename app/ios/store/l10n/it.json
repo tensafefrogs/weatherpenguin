@@ -1,0 +1,10 @@
+{
+  "locale": "it",
+  "listing": {
+    "name": "Weather Penguin",
+    "subtitle": "Cosa mi metto oggi?",
+    "promotional_text": "Un pinguino disegnato a mano controlla le previsioni e si veste di conseguenza. Maglione, impermeabile o bikini: basta un’occhiata e sai cosa metterti.",
+    "description": "Weather Penguin ti dice a colpo d’occhio cosa metterti oggi.\n\nApri l’app e un pinguino disegnato a mano è già vestito per il meteo dove ti trovi: maglione e sciarpa quando fa freddo, giacca quando fa fresco, maglietta quando fa caldo e bikini quando fa caldissimo. Quando arriva la pioggia, spuntano l’impermeabile, il poncho o la cuffia.\n\n• Oggi e domani: scorri per vedere cosa indosserà il pinguino domani\n• Le tue temperature: scegli quando il pinguino passa dal maglione alla giacca e alla maglietta\n• Pinguino del mattino: una notifica facoltativa ogni mattina con cosa indossare\n• Widget per la schermata Home e la schermata di blocco\n• Chiedi a Siri cosa metterti\n• Un’app per Apple Watch e complicazioni per il quadrante\n• °F o °C\n• Adesivi iMessage di ogni outfit\n• Le tue impostazioni ti seguono sugli altri dispositivi con iCloud\n• Nessun account, nessuna pubblicità, nessun tracciamento\n\nDati meteo da Apple Weather.",
+    "keywords": "meteo,pinguino,previsioni,vestiti,cosa mettere,pioggia,temperatura,ombrello,giacca,freddo,sole"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "version": "2.1",
+  "xcode27": true,
+  "testflight": {
+    "groups": [
+      "Internal"
+    ],
+    "whats_new": "Preview of the next version."
+  }
+}

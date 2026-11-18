@@ -1,0 +1,96 @@
+# Apple Watch screenshots: builds the watch app for the simulator, runs it with the sample forecast
+# (launch argument -sample 1) on an Apple Watch Ultra simulator, and saves Today and Tomorrow in English
+# (or the language asked for) as a workflow artifact. English ones are also committed to
+# app/ios/store/screenshots/watch-<n>.png, where the App Store listing uploads them from.
+# With "all languages" on, it takes them in every App Store language and commits them to
+# app/ios/store/screenshots/watch/<App Store locale>/, which the listing workflow uploads to each language's page.
+name: Watch screenshots
+on:
+  workflow_dispatch:
+    inputs:
+      lang:
+        description: Language (an .lproj name like de, ja, zh-Hans)
+        default: en
+      all:
+        description: All App Store languages (commits screenshots/watch/<locale>/)
+        type: boolean
+        default: false
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: write   # to commit the English screenshots
+jobs:
+  shots:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the watch app for the simulator
+        run: |
+          brew install xcodegen
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
+          cd app/ios && xcodegen generate
+          xcodebuild build -project WeatherPenguin.xcodeproj -scheme WeatherPenguinWatch -configuration Debug \
+            -destination 'generic/platform=watchOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO > build.log 2>&1 \
+            || { grep -E 'error:' build.log | sort -u | head -40; tail -40 build.log; exit 1; }
+          find build -name 'WeatherPenguinWatch.app' -path '*watchsimulator*' | head -1 > ../../app-path.txt
+          cat ../../app-path.txt
+      - name: Run it on an Apple Watch Ultra simulator and take the screenshots
+        env:
+          LANG_ARG: ${{ inputs.lang }}
+          ALL: ${{ inputs.all }}
+        run: |
+          runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='watchOS' and x['isAvailable']]; print(r[-1]['identifier'])")
+          devtype=$(xcrun simctl list devicetypes -j | python3 -c "import json,sys; d=[x for x in json.load(sys.stdin)['devicetypes'] if 'Ultra' in x['name'] and 'Watch' in x['name']]; print(d[-1]['identifier'])")
+          echo "runtime $runtime, device $devtype"
+          udid=$(xcrun simctl create shots "$devtype" "$runtime")
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl status_bar "$udid" override --time 9:41 || true
+          xcrun simctl install "$udid" "app/ios/$(cat app-path.txt)"
+          mkdir -p shots
+          # App Store locale = watch language : region (the region picks °C or °F, as on a real watch)
+          if [ "$ALL" = true ]; then
+            pairs="en-US=en:en_US de-DE=de:de_DE fr-FR=fr:fr_FR es-ES=es:es_ES es-MX=es:es_MX it=it:it_IT pt-BR=pt-BR:pt_BR pt-PT=pt-PT:pt_PT nl-NL=nl:nl_NL sv=sv:sv_SE da=da:da_DK no=nb:nb_NO fi=fi:fi_FI pl=pl:pl_PL ru=ru:ru_RU ja=ja:ja_JP ko=ko:ko_KR zh-Hans=zh-Hans:zh_CN zh-Hant=zh-Hant:zh_TW"
+          else
+            pairs="single=$LANG_ARG:"
+          fi
+          for pair in $pairs; do
+            locale=${pair%%=*}; rest=${pair#*=}; lang=${rest%%:*}; region=${rest#*:}
+            dir=shots; [ "$locale" = single ] || dir=shots/$locale
+            mkdir -p "$dir"
+            for page in 0 1; do
+              xcrun simctl terminate "$udid" com.weatherpenguin.WeatherPenguin.watchkitapp 2>/dev/null || true
+              if [ -n "$region" ]; then
+                xcrun simctl launch "$udid" com.weatherpenguin.WeatherPenguin.watchkitapp -sample 1 -page $page -AppleLanguages "($lang)" -AppleLocale "$region"
+              else
+                xcrun simctl launch "$udid" com.weatherpenguin.WeatherPenguin.watchkitapp -sample 1 -page $page -AppleLanguages "($lang)"
+              fi
+              sleep 6
+              xcrun simctl io "$udid" screenshot "$dir/watch-$((page + 1)).png"
+            done
+          done
+          ls -la shots
+      - uses: actions/upload-artifact@v4
+        with:
+          name: watch-screenshots-${{ inputs.lang }}
+          path: shots/
+      - name: Commit the screenshots
+        if: inputs.lang == 'en' || inputs.all
+        run: |
+          if [ "${{ inputs.all }}" = true ]; then
+            mkdir -p app/ios/store/screenshots/watch
+            cp -R shots/* app/ios/store/screenshots/watch/
+            cp shots/en-US/watch-*.png app/ios/store/screenshots/
+          else
+            cp shots/watch-*.png app/ios/store/screenshots/
+          fi
+          git config user.name 'Watch screenshots'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add app/ios/store/screenshots/watch-*.png app/ios/store/screenshots/watch 2>/dev/null || git add app/ios/store/screenshots/watch-*.png
+          echo '--- files the build changed (should be none besides the screenshots)'; git status --short; git diff --stat
+          git diff --cached --quiet && exit 0
+          git commit -q -m 'Apple Watch screenshots'
+          for i in 1 2 3; do git pull --rebase --autostash -q && git push -q && exit 0; sleep 5; done
+          exit 1

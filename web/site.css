@@ -1,0 +1,96 @@
+/* weatherpenguin.com: the 2013 look (light blue, hand lettering, yellow band), mobile first. */
+@font-face {
+  font-family: "Inter";
+  src: url(app/fonts/Inter.woff2) format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Sue Ellen Francisco";
+  src: url(fonts/SueEllenFrancisco-Regular.ttf) format("truetype");
+  font-display: swap;
+}
+:root {
+  --sky: #d7eef5;
+  --sun: #ffff96;
+  --ink: #1d1d1f;
+  --soft: #4a5560;
+  --link: #1f5fbf;
+  --hand: "Sue Ellen Francisco", cursive;
+  color: var(--ink);
+  background: var(--sky);
+  font: 17px/1.5 "Inter", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; overflow-x: hidden; }
+a { color: var(--link); text-underline-offset: 0.15em; }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 4px; }
+h1, h2 { text-wrap: balance; }
+p { text-wrap: pretty; }
+img { max-width: 100%; height: auto; }
+
+.title {
+  margin: 0;
+  padding: 24px 16px 0;
+  text-align: center;
+  font: 400 clamp(56px, 14vw, 110px)/1 var(--hand);
+}
+.title a { color: inherit; text-decoration: none; }
+
+.hero { position: relative; text-align: center; padding: 8px 16px 0; overflow: hidden; }
+.hero img { display: block; margin: 0 auto -6px; width: min(520px, 100%); position: relative; z-index: 1; }
+
+/* Rain falling on the umbrella. Decorative; still when motion is reduced. */
+.rain { position: absolute; inset: 0; pointer-events: none; }
+.rain i {
+  position: absolute;
+  top: -12px;
+  width: 9px; height: 9px;
+  background: #79dbfc;
+  border-radius: 0 5px 5px 5px;
+  transform: rotate(45deg);
+  animation: drop 1.2s linear infinite;
+}
+@keyframes drop { to { top: 105%; opacity: 0.2; } }
+@media (prefers-reduced-motion: reduce) { .rain { display: none; } }
+
+.band { background: var(--sun); padding: 40px 16px 48px; }
+.band-inner {
+  max-width: 960px; margin: 0 auto;
+  display: grid; gap: 32px; align-items: center; justify-items: center;
+}
+.pitch { text-align: center; font: 400 clamp(30px, 6vw, 40px)/1.15 var(--hand); max-width: 460px; }
+.pitch p { margin: 0 0 24px; }
+
+.store {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #000; color: #fff; text-decoration: none;
+  font: 500 17px/1.2 "Inter", sans-serif;
+  padding: 10px 20px; border-radius: 10px;
+}
+.store small { display: block; font-size: 11px; font-weight: 400; }
+
+.phone {
+  width: 300px; height: 620px;
+  border: 10px solid #111; border-radius: 44px;
+  overflow: hidden; background: #d8e2ff;
+  box-shadow: 0 20px 40px rgb(0 0 0 / 0.18);
+}
+.phone iframe { width: 100%; height: 100%; border: 0; display: block; }
+.try { font: 400 24px/1 var(--hand); text-align: center; margin: 10px 0 0; }
+.try a { margin: 0 6px; }
+.try a[aria-current] { color: var(--ink); text-decoration-thickness: 2px; }
+
+@media (min-width: 760px) {
+  .band-inner { grid-template-columns: 1fr auto; }
+}
+
+.page { max-width: 720px; margin: 0 auto; padding: 8px 20px 40px; }
+.page h1 { font: 400 48px/1.1 var(--hand); margin: 16px 0 8px; }
+.page h2 { font-size: 20px; margin: 28px 0 6px; }
+
+.footer { text-align: center; padding: 24px 16px 40px; font: 400 22px/1.6 var(--hand); }
+.footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 20px; }
+.footer a { color: var(--ink); }
+.footer p { margin: 4px 0 0; }
+.footer small { font-size: inherit; }

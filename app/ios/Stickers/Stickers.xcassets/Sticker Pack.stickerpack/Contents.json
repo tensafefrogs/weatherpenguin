@@ -1,0 +1,35 @@
+{
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "properties": {
+    "grid-size": "regular"
+  },
+  "stickers": [
+    {
+      "filename": "Naked Penguin.sticker"
+    },
+    {
+      "filename": "Cold Penguin.sticker"
+    },
+    {
+      "filename": "Jacket Penguin.sticker"
+    },
+    {
+      "filename": "Raincoat Penguin.sticker"
+    },
+    {
+      "filename": "Warm Penguin.sticker"
+    },
+    {
+      "filename": "Warm Rain Penguin.sticker"
+    },
+    {
+      "filename": "Bikini Penguin.sticker"
+    },
+    {
+      "filename": "Bikini Rain Penguin.sticker"
+    }
+  ]
+}

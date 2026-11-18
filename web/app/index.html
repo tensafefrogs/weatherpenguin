@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#d8e2ff">
+  <title>Weather Penguin</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="../favicon.png">
+</head>
+<body>
+  <main id="pages" class="pages" aria-live="polite"></main>
+  <div id="dots" class="dots" aria-hidden="true"></div>
+  <button id="gear" class="gear" type="button" data-t-label="Settings" aria-label="Settings">
+    <img src="images/gear_icon.png" alt="">
+  </button>
+  <footer id="attribution" class="attribution"></footer>
+
+  <dialog id="settings" class="settings" aria-labelledby="settings-title">
+    <form method="dialog">
+      <header>
+        <button value="cancel" type="submit" class="link" data-t>Cancel</button>
+        <h2 id="settings-title" tabindex="-1" autofocus data-t>Settings</h2>
+        <button value="done" type="submit" class="link strong" data-t>Done</button>
+      </header>
+      <!-- The clothes: one slider, three handles (where the jacket, T-shirt and bikini start). Each penguin stands
+           over its stretch of the track; the temperatures sit under the handles (main.js layoutScale). -->
+      <section class="group">
+        <h3 class="group-title" data-t>Choose when the penguin changes clothes.</h3>
+        <div class="scale" id="scale">
+          <div class="scale-penguins" aria-hidden="true">
+            <img src="images/cold.png" alt=""><img src="images/jacket.png" alt=""><img src="images/warm.png" alt=""><img src="images/hot.png" alt="">
+          </div>
+          <div class="scale-labels" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+        <div class="group-end"><button type="button" id="reset" class="link small" data-t>Reset to defaults</button></div>
+      </section>
+      <section class="group row units" role="radiogroup" aria-labelledby="units-title">
+        <span class="row-title" id="units-title" data-t>Temperature</span>
+        <span class="toggle"><label><input type="radio" name="units" value="f"> °F</label><label><input type="radio" name="units" value="c"> °C</label></span>
+      </section>
+      <section class="group morning" id="morning" hidden>
+        <div class="row">
+          <span class="row-text">
+            <span class="row-title" id="morning-title" data-t>Morning penguin</span>
+            <span class="row-sub" id="morning-what" data-t>Tell me what to wear each morning</span>
+          </span>
+          <select id="morning-pick" aria-labelledby="morning-title morning-what"></select>
+        </div>
+        <div class="morning-time"><input type="time" id="morning-time" value="07:00" hidden aria-labelledby="morning-title"></div>
+        <p class="row-sub" id="morning-denied" hidden data-t>Notifications are off for Weather Penguin. Turn them on in the Settings app.</p>
+      </section>
+      <p class="settings-attribution" id="settings-attribution"></p>
+      <p class="about"><a href="https://www.weatherpenguin.com" data-external>weatherpenguin.com</a>
+        · <a href="https://www.weatherpenguin.com/privacy.html" data-external data-t>Privacy</a></p>
+    </form>
+  </dialog>
+
+  <script src="config.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

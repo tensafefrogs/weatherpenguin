@@ -1,0 +1,63 @@
+# The App Store's widgets screenshot in every language: builds WidgetPreview (app/ios/WidgetPreview, never shipped),
+# runs its App Store sheet (-page 2: Home Screen and Lock Screen widgets with sample weather) on an iPhone Pro Max
+# simulator in each language, and commits app/ios/store/screenshots/widgets/<App Store locale>.png, which
+# app/ios/store/screenshots.js puts in the captioned screenshots. Run by hand after changing the widgets.
+name: Store widget screenshots
+on:
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: write
+jobs:
+  shots:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the preview app for the simulator
+        run: |
+          brew install xcodegen
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
+          cd app/ios && xcodegen generate
+          xcodebuild build -project WeatherPenguin.xcodeproj -scheme WidgetPreview -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO > build.log 2>&1 \
+            || { grep -E 'error:' build.log | sort -u | head -40; tail -40 build.log; exit 1; }
+          find build -name 'WidgetPreview.app' -path '*iphonesimulator*' | head -1 > ../../app-path.txt
+      - name: Take the sheet in each language on an iPhone Pro Max (1320 x 2868, the App Store's 6.9-inch size)
+        run: |
+          runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='iOS' and x['isAvailable']]; print(r[-1]['identifier'])")
+          devtype=$(xcrun simctl list devicetypes -j | python3 -c "import json,sys; import re; d=[(int(m.group(1)),x['identifier']) for x in json.load(sys.stdin)['devicetypes'] for m in [re.fullmatch(r'iPhone (\\d+) Pro Max', x['name'])] if m]; print(max(d)[1])")
+          echo "runtime $runtime, device $devtype"
+          udid=$(xcrun simctl create shots "$devtype" "$runtime")
+          xcrun simctl boot "$udid"; xcrun simctl bootstatus "$udid" -b
+          xcrun simctl status_bar "$udid" override --time 9:41 --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
+          xcrun simctl install "$udid" "app/ios/$(cat app-path.txt)"
+          out=app/ios/store/screenshots/widgets; mkdir -p "$out"
+          # a fresh simulator shows system banners (Apple Intelligence) for a while after boot: let them pass
+          xcrun simctl launch "$udid" com.weatherpenguin.WidgetPreview -page 2; sleep 30
+          # App Store locale = app language (.lproj) : temperatures in C?
+          for pair in en-US=en:false de-DE=de:true fr-FR=fr:true es-ES=es:true es-MX=es:true it=it:true pt-BR=pt-BR:true \
+                      pt-PT=pt-PT:true nl-NL=nl:true sv=sv:true da=da:true no=nb:true fi=fi:true pl=pl:true ru=ru:true \
+                      ja=ja:true ko=ko:true zh-Hans=zh-Hans:true zh-Hant=zh-Hant:true; do
+            locale=${pair%%=*}; rest=${pair#*=}; lang=${rest%%:*}; celsius=${rest#*:}
+            xcrun simctl terminate "$udid" com.weatherpenguin.WidgetPreview 2>/dev/null || true
+            xcrun simctl launch "$udid" com.weatherpenguin.WidgetPreview -page 2 -celsius "$celsius" -AppleLanguages "($lang)"
+            sleep 5
+            xcrun simctl io "$udid" screenshot "$out/$locale.png"
+          done
+          ls -la "$out"; python3 -c "import struct,sys; d=open('$out/en-US.png','rb').read(24); print('size', struct.unpack('>II', d[16:24]))"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: store-widgets
+          path: app/ios/store/screenshots/widgets/*.png
+      - name: Commit them
+        run: |
+          git config user.name 'Store widget screenshots'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add app/ios/store/screenshots/widgets/*.png
+          git diff --cached --quiet && exit 0
+          git commit -q -m 'Store widget screenshots'
+          for i in 1 2 3; do git pull --rebase --autostash -q && git push -q && exit 0; sleep 5; done
+          exit 1

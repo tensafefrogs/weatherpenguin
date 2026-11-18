@@ -1,0 +1,193 @@
+{
+  "_comment": "Captions above the App Store screenshots (app/ios/store/screenshots.js), per App Store locale. Machine-translated; a native speaker's read-through is welcome. Keep them short: one line on an iPhone.",
+  "en-US": {
+    "today": "What to wear today, at a glance",
+    "tomorrow": "Swipe to see tomorrow",
+    "sideBySide": "Today and tomorrow, side by side",
+    "widgets": "On your Home Screen and Lock Screen",
+    "handDrawn": "Hand-drawn for every kind of weather",
+    "settings": "Choose when the penguin changes clothes",
+    "book": "Hold it like a book",
+    "laptop": "Or stand it up like a laptop"
+  },
+  "de-DE": {
+    "today": "Was heute anziehen – auf einen Blick",
+    "tomorrow": "Wische für morgen",
+    "sideBySide": "Heute und morgen nebeneinander",
+    "widgets": "Auf dem Home- und Sperrbildschirm",
+    "handDrawn": "Handgezeichnet für jedes Wetter",
+    "settings": "Wähle, wann sich der Pinguin umzieht",
+    "book": "Halte es wie ein Buch",
+    "laptop": "Oder stell es auf wie einen Laptop"
+  },
+  "fr-FR": {
+    "today": "Quoi mettre aujourd’hui, en un coup d’œil",
+    "tomorrow": "Balayez pour voir demain",
+    "sideBySide": "Aujourd’hui et demain, côte à côte",
+    "widgets": "Sur l’écran d’accueil et l’écran verrouillé",
+    "handDrawn": "Dessiné à la main pour chaque météo",
+    "settings": "Choisissez quand le pingouin se change",
+    "book": "Tenez-le comme un livre",
+    "laptop": "Ou posez-le comme un ordinateur portable"
+  },
+  "es-ES": {
+    "today": "Qué ponerte hoy, de un vistazo",
+    "tomorrow": "Desliza para ver mañana",
+    "sideBySide": "Hoy y mañana, uno al lado del otro",
+    "widgets": "En la pantalla de inicio y la bloqueada",
+    "handDrawn": "Dibujado a mano para todo tipo de tiempo",
+    "settings": "Elige cuándo se cambia de ropa el pingüino",
+    "book": "Sostenlo como un libro",
+    "laptop": "O apóyalo como un portátil"
+  },
+  "es-MX": {
+    "today": "Qué ponerte hoy, de un vistazo",
+    "tomorrow": "Desliza para ver mañana",
+    "sideBySide": "Hoy y mañana, uno al lado del otro",
+    "widgets": "En la pantalla de inicio y la bloqueada",
+    "handDrawn": "Dibujado a mano para todo tipo de clima",
+    "settings": "Elige cuándo se cambia de ropa el pingüino",
+    "book": "Sostenlo como un libro",
+    "laptop": "O ponlo de pie como una laptop"
+  },
+  "it": {
+    "today": "Cosa metterti oggi, a colpo d’occhio",
+    "tomorrow": "Scorri per vedere domani",
+    "sideBySide": "Oggi e domani, fianco a fianco",
+    "widgets": "Nella schermata Home e di blocco",
+    "handDrawn": "Disegnato a mano per ogni tempo",
+    "settings": "Scegli quando il pinguino si cambia",
+    "book": "Tienilo come un libro",
+    "laptop": "O appoggialo come un portatile"
+  },
+  "pt-BR": {
+    "today": "O que vestir hoje, num relance",
+    "tomorrow": "Deslize para ver amanhã",
+    "sideBySide": "Hoje e amanhã, lado a lado",
+    "widgets": "Na Tela de Início e na Tela Bloqueada",
+    "handDrawn": "Desenhado à mão para todo tipo de tempo",
+    "settings": "Escolha quando o pinguim troca de roupa",
+    "book": "Segure como um livro",
+    "laptop": "Ou apoie como um notebook"
+  },
+  "pt-PT": {
+    "today": "O que vestir hoje, num relance",
+    "tomorrow": "Deslize para ver amanhã",
+    "sideBySide": "Hoje e amanhã, lado a lado",
+    "widgets": "No ecrã principal e no ecrã bloqueado",
+    "handDrawn": "Desenhado à mão para todo o tipo de tempo",
+    "settings": "Escolha quando o pinguim muda de roupa",
+    "book": "Segure-o como um livro",
+    "laptop": "Ou apoie-o como um portátil"
+  },
+  "nl-NL": {
+    "today": "Wat trek je vandaag aan? In één oogopslag",
+    "tomorrow": "Veeg voor morgen",
+    "sideBySide": "Vandaag en morgen naast elkaar",
+    "widgets": "Op je beginscherm en toegangsscherm",
+    "handDrawn": "Met de hand getekend voor elk weer",
+    "settings": "Kies wanneer de pinguïn zich omkleedt",
+    "book": "Houd hem vast als een boek",
+    "laptop": "Of zet hem neer als een laptop"
+  },
+  "sv": {
+    "today": "Vad du ska ha på dig i dag, med en blick",
+    "tomorrow": "Svep för att se i morgon",
+    "sideBySide": "I dag och i morgon, sida vid sida",
+    "widgets": "På hemskärmen och låsskärmen",
+    "handDrawn": "Handritad för alla sorters väder",
+    "settings": "Välj när pingvinen byter kläder",
+    "book": "Håll den som en bok",
+    "laptop": "Eller ställ den som en laptop"
+  },
+  "da": {
+    "today": "Hvad du skal have på i dag, med ét blik",
+    "tomorrow": "Swipe for at se i morgen",
+    "sideBySide": "I dag og i morgen side om side",
+    "widgets": "På hjemmeskærmen og låseskærmen",
+    "handDrawn": "Håndtegnet til alt slags vejr",
+    "settings": "Vælg, hvornår pingvinen skifter tøj",
+    "book": "Hold den som en bog",
+    "laptop": "Eller stil den op som en bærbar"
+  },
+  "no": {
+    "today": "Hva du skal ha på deg i dag, med ett blikk",
+    "tomorrow": "Sveip for å se i morgen",
+    "sideBySide": "I dag og i morgen side om side",
+    "widgets": "På Hjem-skjermen og låseskjermen",
+    "handDrawn": "Håndtegnet for all slags vær",
+    "settings": "Velg når pingvinen bytter klær",
+    "book": "Hold den som en bok",
+    "laptop": "Eller sett den opp som en bærbar"
+  },
+  "fi": {
+    "today": "Mitä laittaa päälle tänään, yhdellä silmäyksellä",
+    "tomorrow": "Pyyhkäise nähdäksesi huomisen",
+    "sideBySide": "Tänään ja huomenna rinnakkain",
+    "widgets": "Koti-valikossa ja lukitusnäytöllä",
+    "handDrawn": "Käsin piirretty kaikenlaiseen säähän",
+    "settings": "Valitse, milloin pingviini vaihtaa vaatteita",
+    "book": "Pidä sitä kuin kirjaa",
+    "laptop": "Tai seisota se kuin kannettava"
+  },
+  "pl": {
+    "today": "Co założyć dziś – w mgnieniu oka",
+    "tomorrow": "Przesuń, by zobaczyć jutro",
+    "sideBySide": "Dziś i jutro obok siebie",
+    "widgets": "Na ekranie początkowym i ekranie blokady",
+    "handDrawn": "Rysowany ręcznie na każdą pogodę",
+    "settings": "Wybierz, kiedy pingwin się przebiera",
+    "book": "Trzymaj go jak książkę",
+    "laptop": "Albo postaw jak laptopa"
+  },
+  "ru": {
+    "today": "Что надеть сегодня — с одного взгляда",
+    "tomorrow": "Смахните, чтобы увидеть завтра",
+    "sideBySide": "Сегодня и завтра рядом",
+    "widgets": "На экране «Домой» и экране блокировки",
+    "handDrawn": "Нарисован от руки для любой погоды",
+    "settings": "Выберите, когда пингвин переодевается",
+    "book": "Держите как книгу",
+    "laptop": "Или поставьте как ноутбук"
+  },
+  "ja": {
+    "today": "今日何を着るか、ひと目でわかる",
+    "tomorrow": "スワイプして明日をチェック",
+    "sideBySide": "今日と明日を並べて",
+    "widgets": "ホーム画面とロック画面に",
+    "handDrawn": "どんな天気も手描きで",
+    "settings": "ペンギンが着替える気温を選べる",
+    "book": "本のように持って",
+    "laptop": "ノートパソコンのように立てても"
+  },
+  "ko": {
+    "today": "오늘 뭘 입을지 한눈에",
+    "tomorrow": "밀어서 내일 보기",
+    "sideBySide": "오늘과 내일을 나란히",
+    "widgets": "홈 화면과 잠금 화면에",
+    "handDrawn": "모든 날씨를 손그림으로",
+    "settings": "펭귄이 옷을 갈아입는 기온을 선택하세요",
+    "book": "책처럼 들고",
+    "laptop": "노트북처럼 세워서도"
+  },
+  "zh-Hans": {
+    "today": "今天穿什么，一眼就知道",
+    "tomorrow": "滑动查看明天",
+    "sideBySide": "今天和明天，并排显示",
+    "widgets": "在主屏幕和锁定屏幕上",
+    "handDrawn": "手绘每一种天气",
+    "settings": "选择企鹅何时换衣服",
+    "book": "像书一样拿着",
+    "laptop": "或像笔记本电脑一样立起来"
+  },
+  "zh-Hant": {
+    "today": "今天穿什麼，一眼就知道",
+    "tomorrow": "滑動查看明天",
+    "sideBySide": "今天和明天，並排顯示",
+    "widgets": "在主畫面和鎖定畫面上",
+    "handDrawn": "手繪每一種天氣",
+    "settings": "選擇企鵝何時換衣服",
+    "book": "像書一樣拿著",
+    "laptop": "或像筆電一樣立起來"
+  }
+}

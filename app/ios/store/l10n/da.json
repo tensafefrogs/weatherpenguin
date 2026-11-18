@@ -1,0 +1,10 @@
+{
+  "locale": "da",
+  "listing": {
+    "name": "Weather Penguin",
+    "subtitle": "Hvad skal du have på i dag?",
+    "promotional_text": "En håndtegnet pingvin tjekker vejrudsigten og klæder sig efter den. Sweater, regnfrakke eller bikini: ét blik, og du ved, hvad du skal have på.",
+    "description": "Weather Penguin viser dig med ét blik, hvad du skal have på i dag.\n\nÅbn appen, og en håndtegnet pingvin er allerede klædt på til vejret, hvor du er: sweater og halstørklæde, når det er koldt, jakke, når det er køligt, T-shirt, når det er varmt, og bikini, når det er hedt. Er der regn på vej, kommer regnfrakken, ponchoen eller badehætten frem.\n\n• I dag og i morgen: swipe for at se, hvad pingvinen har på i morgen\n• Dine temperaturer: vælg, hvornår pingvinen skifter fra sweater til jakke til T-shirt\n• Morgenpingvin: en notifikation hver morgen om, hvad du skal have på, hvis du vil\n• Widgets til hjemmeskærmen og låseskærmen\n• Spørg Siri, hvad du skal have på\n• En Apple Watch-app og komplikationer til urskiven\n• °F eller °C\n• iMessage-mærkater med alle outfits\n• Dine indstillinger følger med til dine andre enheder via iCloud\n• Ingen konto, ingen reklamer, ingen sporing\n\nVejrdata fra Apple Weather.",
+    "keywords": "vejr,vejrudsigt,tøj,outfit,påklædning,regn,temperatur,sød,paraply,jakke,koldt,sol,pingvin"
+  }
+}

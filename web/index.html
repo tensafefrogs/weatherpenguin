@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weather Penguin: put some cute in your forecast</title>
+  <meta name="description" content="A hand-drawn penguin who tells you what to wear today. Free for iPhone, iPad and Apple Watch.">
+  <link rel="canonical" href="https://weatherpenguin.com/">
+  <meta name="theme-color" content="#d7eef5">
+  <meta name="color-scheme" content="light">
+  <meta name="apple-itunes-app" content="app-id=713690248">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="stylesheet" href="site.css">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://weatherpenguin.com/">
+  <meta property="og:title" content="Weather Penguin">
+  <meta property="og:description" content="A hand-drawn penguin who tells you what to wear today.">
+  <meta property="og:image" content="https://weatherpenguin.com/img/main_umbrella.png">
+  <meta property="og:image:alt" content="The Weather Penguin holding an umbrella">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@type": "MobileApplication", "name": "Weather Penguin",
+   "operatingSystem": "iOS", "applicationCategory": "WeatherApplication",
+   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+   "author": {"@type": "Organization", "name": "EEG LLC"},
+   "downloadUrl": "https://apps.apple.com/app/id713690248", "image": "https://weatherpenguin.com/img/main_umbrella.png"}
+  </script>
+  <script src="app/config.js" defer></script>
+  <script type="module">import { startStats } from './app/stats.js'; startStats();</script>
+</head>
+<body>
+  <header>
+    <h1 class="title">Weather Penguin</h1>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="rain" aria-hidden="true"></div>
+      <img src="img/main_umbrella.png" width="650" height="607" alt="The Weather Penguin holding an umbrella" fetchpriority="high">
+    </div>
+
+    <section class="band" aria-label="Get the app and try it">
+      <div class="band-inner">
+        <div class="pitch">
+          <p>Weather Penguin is a cute, simple way to see what to wear today.</p>
+          <a class="store" href="https://apps.apple.com/app/id713690248">
+            <span><small>Download on the</small>App Store</span>
+          </a>
+        </div>
+        <div>
+          <div class="phone">
+            <iframe src="app/?sample=hot" title="Weather Penguin demo" loading="lazy" id="demo"></iframe>
+          </div>
+          <p class="try">Try:
+            <a href="app/?sample=rainLater" data-demo aria-controls="demo">rain</a>
+            <a href="app/?sample=cold" data-demo aria-controls="demo">cold</a>
+            <a href="app/?sample=warm" data-demo aria-controls="demo">warm</a>
+            <a href="app/?sample=hot" data-demo aria-controls="demo" aria-current="true">hot</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <nav aria-label="Site"><a href="support.html">Support</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></nav>
+    <p><small>&copy; EEG LLC</small></p>
+  </footer>
+
+  <script type="module">
+    // Swap the demo's weather without leaving the page.
+    const demo = document.getElementById('demo');
+    for (const a of document.querySelectorAll('[data-demo]')) {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        demo.src = a.getAttribute('href');
+        for (const b of document.querySelectorAll('[data-demo]')) b.toggleAttribute('aria-current', b === a);
+      });
+    }
+    // A few drops on the umbrella.
+    const rain = document.querySelector('.rain');
+    for (let i = 0; i < 24; i++) {
+      const drop = document.createElement('i');
+      drop.style.left = `${Math.random() * 100}%`;
+      drop.style.animationDelay = `${Math.random() * 1.2}s`;
+      drop.style.animationDuration = `${0.9 + Math.random() * 0.6}s`;
+      rain.append(drop);
+    }
+  </script>
+</body>
+</html>

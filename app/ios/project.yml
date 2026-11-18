@@ -1,0 +1,223 @@
+# Xcode project definition. Generate the .xcodeproj with:  xcodegen generate
+# (brew install xcodegen). The .xcodeproj is not checked in.
+name: WeatherPenguin
+options:
+  bundleIdPrefix: com.weatherpenguin
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    DEVELOPMENT_TEAM: K37CSPL839
+    MARKETING_VERSION: "2.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1,2"   # iPhone (iPhone Duo included) and iPad
+    CODE_SIGN_STYLE: Automatic
+targets:
+  WeatherPenguin:
+    type: application
+    platform: iOS
+    sources:
+      - path: WeatherPenguin
+      # The Swift rules, forecast, penguins and strings the watch and widgets use, for Siri and Shortcuts
+      # (WhatToWear.swift). The app has its own InfoPlist.strings.
+      - path: Shared
+        excludes:
+          - "*.lproj/InfoPlist.strings"
+      - path: Widgets/PenguinWidgetViews.swift
+      # The web UI, shared with the website. Bundled so the app works offline
+      # and is a real app rather than a wrapped website.
+      - path: ../../web/app
+        type: folder
+        buildPhase: resources
+        excludes:
+          - test
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.weatherpenguin.WeatherPenguin
+        PRODUCT_NAME: WeatherPenguin
+        CODE_SIGN_ENTITLEMENTS: WeatherPenguin/WeatherPenguin.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    info:
+      path: WeatherPenguin/Info.plist
+      properties:
+        CFBundleDisplayName: Weather Penguin
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: en
+        # The languages the app has (web/app/lang and the .lproj folders): iOS gives the web UI the
+        # user's first one of these, and WeatherKit's condition text comes in it too.
+        CFBundleLocalizations: [en, da, de, es, fi, fr, it, ja, ko, nb, nl, pl, pt-BR, pt-PT, ru, sv, zh-Hans, zh-Hant]
+        ITSAppUsesNonExemptEncryption: false
+        LSApplicationCategoryType: public.app-category.weather
+        NSLocationWhenInUseUsageDescription: Weather Penguin uses your location to check the weather where you are.
+        UILaunchScreen:
+          UIColorName: Sky
+        # Sideways too: iPhone Duo's inner screen propped up like a laptop is landscape, and an iPad goes any way
+        # round (also needed for Split View and Slide Over). The page has layouts for each (web/app/layout.js).
+        UISupportedInterfaceOrientations~iphone:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIStatusBarStyle: UIStatusBarStyleDarkContent
+        UIViewControllerBasedStatusBarAppearance: false
+        UIUserInterfaceStyle: Light
+    dependencies:
+      - target: Stickers
+      - target: Widgets
+      - target: WeatherPenguinWatch
+  # Home Screen widgets (small and medium). Shared/ as for the watch: the outfit rules, forecast, penguins, strings.
+  Widgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widgets
+      - path: Shared
+    entitlements:
+      path: Widgets/Widgets.entitlements
+      properties:
+        # WeatherKit, and the iPhone app's iCloud key-value store for the temperature bands and °C/°F.
+        # Listed here (not only in the file) because xcodegen rewrites the file from this.
+        com.apple.developer.weatherkit: true
+        com.apple.developer.ubiquity-kvstore-identifier: $(TeamIdentifierPrefix)com.weatherpenguin.WeatherPenguin
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.weatherpenguin.WeatherPenguin.widgets
+        PRODUCT_NAME: WeatherPenguinWidgets
+        CODE_SIGN_ENTITLEMENTS: Widgets/Widgets.entitlements
+        SKIP_INSTALL: YES
+    info:
+      path: Widgets/Info.plist
+      properties:
+        CFBundleDisplayName: Weather Penguin
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, da, de, es, fi, fr, it, ja, ko, nb, nl, pl, pt-BR, pt-PT, ru, sv, zh-Hans, zh-Hant]
+        NSWidgetWantsLocation: true
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+
+  # Not shipped (no other target depends on it): lays the widgets out at their real sizes in the simulator for
+  # the Widget screenshots workflow.
+  WidgetPreview:
+    type: application
+    platform: iOS
+    sources:
+      - path: WidgetPreview
+      - path: Widgets/PenguinWidgetViews.swift
+      - path: Widgets/DaySwitch.swift
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.weatherpenguin.WidgetPreview
+        PRODUCT_NAME: WidgetPreview
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""   # no icon: it's never installed anywhere but the simulator
+    info:
+      path: WidgetPreview/Info.plist
+      properties:
+        CFBundleDisplayName: Widget Preview
+        CFBundleDevelopmentRegion: en
+        UILaunchScreen: {}
+
+  Stickers:
+    type: app-extension.messages-sticker-pack
+    platform: iOS
+    sources:
+      - path: Stickers
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.weatherpenguin.WeatherPenguin.Weather-Penguin-Sticker-Pack
+        PRODUCT_NAME: Weather Penguin
+        ASSETCATALOG_COMPILER_APPICON_NAME: iMessage App Icon
+    info:
+      path: Stickers/Info.plist
+      properties:
+        CFBundleDisplayName: Weather Penguin
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, da, de, es, fi, fr, it, ja, ko, nb, nl, pl, pt-BR, pt-PT, ru, sv, zh-Hans, zh-Hant]
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.message-payload-provider
+          NSExtensionPrincipalClass: StickerBrowserViewController
+
+  # The Apple Watch app (native SwiftUI: a watch can't show the web UI). Embedded in the iPhone app, and
+  # installs on its own too. Shared/ holds the outfit rules (the Swift copy of web/app/rules.js), the
+  # forecast, the penguins and the strings (tools/make_watch_assets.py).
+  WeatherPenguinWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - path: Watch
+      - path: Shared
+    dependencies:
+      - target: WatchWidgets
+    entitlements:
+      path: Watch/Watch.entitlements
+      properties:
+        # WeatherKit, and the iPhone app's iCloud key-value store so the watch reads the same settings.
+        # Listed here (not only in the file) because xcodegen rewrites the file from this.
+        com.apple.developer.weatherkit: true
+        com.apple.developer.ubiquity-kvstore-identifier: $(TeamIdentifierPrefix)com.weatherpenguin.WeatherPenguin
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.weatherpenguin.WeatherPenguin.watchkitapp
+        PRODUCT_NAME: WeatherPenguinWatch
+        TARGETED_DEVICE_FAMILY: "4"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_ENTITLEMENTS: Watch/Watch.entitlements
+    info:
+      path: Watch/Info.plist
+      properties:
+        CFBundleDisplayName: Weather Penguin
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, da, de, es, fi, fr, it, ja, ko, nb, nl, pl, pt-BR, pt-PT, ru, sv, zh-Hans, zh-Hant]
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.weatherpenguin.WeatherPenguin
+        WKRunsIndependentlyOfCompanionApp: true
+        NSLocationWhenInUseUsageDescription: Weather Penguin uses your location to check the weather where you are.
+
+  # Watch face complications
+  WatchWidgets:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - path: WatchWidgets
+      - path: Shared
+    entitlements:
+      path: WatchWidgets/WatchWidgets.entitlements
+      properties:
+        # WeatherKit, and the iPhone app's iCloud key-value store so the watch reads the same settings.
+        # Listed here (not only in the file) because xcodegen rewrites the file from this.
+        com.apple.developer.weatherkit: true
+        com.apple.developer.ubiquity-kvstore-identifier: $(TeamIdentifierPrefix)com.weatherpenguin.WeatherPenguin
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.weatherpenguin.WeatherPenguin.watchkitapp.widgets
+        PRODUCT_NAME: WatchWidgets
+        TARGETED_DEVICE_FAMILY: "4"
+        CODE_SIGN_ENTITLEMENTS: WatchWidgets/WatchWidgets.entitlements
+        SKIP_INSTALL: YES
+    info:
+      path: WatchWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Weather Penguin
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, da, de, es, fi, fr, it, ja, ko, nb, nl, pl, pt-BR, pt-PT, ru, sv, zh-Hans, zh-Hant]
+        NSWidgetWantsLocation: true
+        NSLocationWhenInUseUsageDescription: Weather Penguin uses your location to check the weather where you are.
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension

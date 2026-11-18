@@ -1,0 +1,80 @@
+# Uploads the App Store listing (app/ios/store/listing.json, l10n/) and screenshots to App Store Connect
+# whenever they change on main, so the store matches the repo. Adapted from tensafefrogs/king-walk.
+# Runs on Linux (cheap). Same secrets as the iOS build. Only the version being prepared can change;
+# when there isn't one, the version part is skipped.
+name: App Store listing
+on:
+  push:
+    branches: [main]
+    paths: ['app/ios/store/listing.json', 'app/ios/store/l10n/*', 'app/ios/store/screenshots/*.png', 'app/ios/store/captions.json', 'app/ios/store/previews/*', 'app/ios/store/creative.py', 'app/ios/store/upload_listing.py', '.github/workflows/store.yml']
+  workflow_dispatch:
+
+# one run at a time, so two never edit App Store Connect at once
+concurrency:
+  group: app-store-listing
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.secrets.outputs.ok }}
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+      BUNDLE_ID: ${{ vars.BUNDLE_ID }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check the secrets are set
+        id: secrets
+        run: |
+          if [ -z "$ASC_KEY_P8" ] || [ -z "$BUNDLE_ID" ]; then echo "::notice::App Store Connect secrets or the BUNDLE_ID variable aren't set yet (README.md, Releasing); nothing uploaded."; echo ok=false >> "$GITHUB_OUTPUT"; else echo ok=true >> "$GITHUB_OUTPUT"; fi
+      - run: pip install pyjwt cryptography
+        if: steps.secrets.outputs.ok == 'true'
+      - name: Upload listing and screenshots
+        if: steps.secrets.outputs.ok == 'true'
+        run: python3 app/ios/store/upload_listing.py
+      - name: App preview video
+        # a new API (App Store Connect API 4.5): a failure here is reported but doesn't fail the listing
+        if: steps.secrets.outputs.ok == 'true'
+        continue-on-error: true
+        run: python3 app/ios/store/creative.py
+
+  # Each other language: the app in that language, captured here (not kept in the repo), then uploaded
+  # to that language's page. Each job keeps its images as a workflow artifact for 30 days, to look at.
+  screenshots:
+    needs: upload
+    if: needs.upload.outputs.ok == 'true'
+    runs-on: ubuntu-24.04   # Playwright has no Chromium for ubuntu-latest (26.04) yet
+    strategy:
+      fail-fast: false
+      matrix:
+        locale: [de-DE, fr-FR, es-ES, es-MX, it, pt-BR, pt-PT, nl-NL, sv, da, no, fi, pl, ru, ja, ko, zh-Hans, zh-Hant]
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+      BUNDLE_ID: ${{ vars.BUNDLE_ID }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Playwright, and fonts for Japanese, Korean and Chinese
+        run: |
+          npm install --no-save playwright@1.56.1 && npx playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Make the screenshots
+        run: |
+          node app/ios/store/screenshots.js --lang ${{ matrix.locale }}
+          # the Apple Watch ones come from the Watch screenshots workflow (all languages)
+          cp app/ios/store/screenshots/watch/${{ matrix.locale }}/watch-*.png app/ios/store/screenshots/l10n/${{ matrix.locale }}/ 2>/dev/null || echo 'No Apple Watch screenshots for this language yet'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.locale }}
+          path: app/ios/store/screenshots/l10n/${{ matrix.locale }}/*.png
+          retention-days: 30
+      - run: pip install pyjwt cryptography
+      - name: Upload them
+        run: python3 app/ios/store/upload_listing.py --locale ${{ matrix.locale }}

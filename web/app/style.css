@@ -1,0 +1,326 @@
+/* v1 look: pale blue, thin type, the penguin front and centre.
+   Inter (SIL Open Font License, fonts/Inter-OFL.txt), bundled. */
+@font-face {
+  font-family: "Inter";
+  src: url(fonts/Inter.woff2) format("woff2");
+  font-weight: 100 900;
+  font-display: block;
+}
+html { touch-action: manipulation; }
+:root {
+  --sky: #d8e2ff;
+  --ink: #000;
+  --soft: #3c4150;
+  --link: #1f5fbf;   /* 4.7:1 on Sky (docs/DESIGN.md) */
+  --thin: 200;
+  font-family: "Inter", sans-serif;
+  font-weight: var(--thin);
+  color: var(--ink);
+  background: var(--sky);
+  -webkit-text-size-adjust: 100%;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--sky); }
+body { -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+img { -webkit-user-drag: none; }
+
+.pages {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.pages::-webkit-scrollbar { display: none; }
+
+.page {
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: calc(env(safe-area-inset-top) + 12px) 24px calc(env(safe-area-inset-bottom) + 64px);
+}
+
+/* The v1 raindrop tile, drawn at 2× (106×142 px → 53×71 pt). It fades out
+   behind the text so the words stay readable. */
+.page { position: relative; }
+.page > * { position: relative; }
+.page.rain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url(images/raindrop.png);
+  background-size: 53px 71px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, rgb(0 0 0 / 0.15) 72%);
+  mask-image: linear-gradient(to bottom, #000 55%, rgb(0 0 0 / 0.15) 72%);
+  animation: fall 3s linear infinite;
+}
+@keyframes fall { to { background-position: 0 142px; } }
+@media (prefers-reduced-motion: reduce) { .page.rain::before { animation: none; } }
+
+/* Each page: title and penguin above, the numbers and words below. */
+.upper { flex: 1 1 auto; min-height: 0; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.lower { flex: none; width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+.title { margin: 0; font-size: 22px; font-weight: var(--thin); }
+.place { margin: 2px 0 0; font-size: 17px; color: var(--soft); min-height: 1.2em; }
+
+/* The art is a 640×1136 canvas with the penguin in its top three quarters. */
+.penguin-frame {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.penguin-frame img {
+  /* shrinks to fit the frame's width or height, whichever is tighter, keeping the drawing whole */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 640 / 880;
+  object-fit: cover;
+  object-position: 50% 0;
+}
+
+.temp { font-size: 72px; line-height: 1; margin: 6px 0 0; font-weight: 100; }
+.high { font-size: 22px; margin: 4px 0 0; }
+.summary { font-size: 22px; margin: 10px 0 0; min-height: 1.3em; color: var(--soft); }
+
+.dots {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 36px);
+  display: flex; justify-content: center; gap: 8px;
+  pointer-events: none;
+}
+.dots span { width: 7px; height: 7px; border-radius: 50%; background: rgb(0 0 0 / 0.2); transition: background 0.2s; }
+.dots span.on { background: rgb(0 0 0 / 0.65); }
+
+.gear {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 6px);
+  right: 10px;
+  width: 44px; height: 44px;
+  padding: 8px;
+  border: 0; background: none;
+}
+.gear img { width: 100%; height: 100%; opacity: 0.75; }
+
+.attribution {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 8px);
+  display: flex; justify-content: center; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 400; color: var(--soft);
+}
+.attribution img { height: 12px; display: block; }
+.attribution a { display: inline-block; padding: 8px; } /* a 28 pt tap target around the small mark */
+.settings-attribution { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0 0;
+  padding-top: 18px; border-top: 1px solid rgb(60 65 80 / 0.18); font-size: 15px; color: var(--soft); }
+.settings-attribution:empty { display: none; }
+.settings-attribution img { height: 14px; }
+.settings-attribution a { color: var(--link); }
+.attribution a { color: inherit; }
+
+.message { max-width: 320px; padding-bottom: 8vh; }
+.message h1 { font-size: 30px; font-weight: var(--thin); margin: 0 0 8px; }
+.message p { font-size: 19px; margin: 0 0 18px; color: var(--soft); }
+.message p.detail { font-size: 12px; margin: 18px 0 0; overflow-wrap: anywhere; }
+
+button.pill {
+  font: inherit; font-size: 20px; font-weight: 300;
+  color: var(--ink); background: none;
+  border: 1px solid var(--ink); border-radius: 22px;
+  padding: 8px 22px;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+button.pill:active { background: rgb(0 0 0 / 0.08); opacity: 0.6; transition: none; }
+
+/* Settings */
+.settings {
+  width: 100%; max-width: 100%; height: 100%; max-height: 100%;
+  margin: 0; border: 0; padding: 0;
+  background: var(--sky); color: var(--ink);
+}
+.settings::backdrop { background: rgb(0 0 0 / 0.25); }
+/* A card in the middle of a big screen; on a half-open iPhone Duo, on the right page or the flat half */
+html.two-up .settings {
+  width: min(560px, 100% - 32px); height: fit-content; max-height: calc(100% - 32px);
+  margin: auto; border-radius: 18px; box-shadow: 0 20px 60px rgb(0 0 0 / 0.25);
+}
+html.two-up .settings form { height: auto; max-height: calc(100dvh - 32px); }
+html.fold-v .settings {
+  width: calc(100% - var(--fold-a) - var(--fold-w)); height: 100%; max-height: 100%;
+  margin: 0 0 0 calc(var(--fold-a) + var(--fold-w)); border-radius: 0;
+}
+html.fold-h .settings {
+  width: 100%; height: calc(100% - var(--fold-a) - var(--fold-w)); max-height: none;
+  margin: calc(var(--fold-a) + var(--fold-w)) 0 0; border-radius: 0;
+}
+.settings form {
+  height: 100%; overflow-y: auto;
+  padding: calc(env(safe-area-inset-top) + 8px) 22px calc(env(safe-area-inset-bottom) + 24px);
+  /* on a wide sheet (iPhone Duo propped up like a laptop, iPhone sideways) keep the content a readable width */
+  padding-inline: max(22px, calc((100% - 560px) / 2));
+}
+.settings header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.settings h2 { font-size: 22px; font-weight: 300; margin: 0; }
+.settings h2:focus { outline: none; }
+button.link { font: inherit; font-size: 18px; color: var(--link); background: none; border: 0; padding: 8px 0; cursor: pointer; }
+button.link.strong { font-weight: 500; }
+button.link.small { font-size: 16px; }
+
+/* Sections, split by hairlines; every section's title and every control the same size */
+.group { padding: 18px 0; border-top: 1px solid rgb(60 65 80 / 0.18); }
+.group:first-of-type { border-top: 0; }
+.group-title { font-size: 18px; font-weight: 300; margin: 0 0 6px; }
+.group-end { display: flex; justify-content: flex-end; margin-top: 4px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.row-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.row-title { font-size: 18px; font-weight: 300; }
+.row-sub { font-size: 15px; font-weight: 300; color: var(--soft); margin: 0; }
+
+/* °F / °C: one pill, the chosen half filled; the fill slides across (two radio buttons underneath) */
+.toggle {
+  position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; flex: none;
+  height: 40px; border: 1px solid var(--ink); border-radius: 20px; padding: 2px;
+}
+.toggle::before {
+  content: ""; position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px);
+  border-radius: 18px; background: var(--ink); transition: transform 0.2s ease;
+}
+.toggle:has(input[value=c]:checked)::before { transform: translateX(100%); }
+.toggle label {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; min-width: 56px; padding: 0 14px; cursor: pointer; transition: color 0.2s;
+}
+.toggle label:has(input:checked) { color: var(--sky); }
+.toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle label:has(input:focus-visible) { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 18px; }
+@media (prefers-reduced-motion: reduce) { .toggle::before, .toggle label { transition: none; } }
+
+/* The single slider: penguins above their stretch of the track, temperatures under the handles */
+.scale { position: relative; margin: 6px 0 0; }
+.scale-penguins { position: relative; height: 88px; }
+.scale-penguins img {
+  position: absolute; bottom: 0; width: 52px; aspect-ratio: 640 / 880;
+  object-fit: cover; object-position: 50% 0; transition: left 0.08s;
+}
+.scale-labels { position: relative; height: 24px; }
+.scale-labels span { position: absolute; top: 0; transform: translateX(-50%); font-size: 18px; white-space: nowrap; }
+
+/* v1 WPRangeSlider: grey track, blue band, white round handles with a grey outline. */
+.range { position: relative; height: 44px; touch-action: none; cursor: pointer; }
+.range-track {
+  position: absolute; left: 14px; right: 14px; top: 50%;
+  height: 6px; margin-top: -3px; border-radius: 3px;
+  background: #e6e6e6;
+}
+.range-fill {
+  position: absolute; top: 0; bottom: 0; border-radius: 3px;
+  background: #0073f0;
+  left: calc(var(--from) * 100%);
+  right: calc((1 - var(--to)) * 100%);
+}
+.range-thumb {
+  position: absolute; top: 50%;
+  width: 28px; height: 28px; margin-top: -14px;
+  left: calc(var(--at) * (100% - 28px));
+  border-radius: 50%;
+  background: #fff;
+  border: 0.5px solid #8e8e93;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+  pointer-events: none;
+  transition: transform 0.1s;
+}
+.range-thumb.active { transform: scale(1.1); background: #f2f2f7; }
+.range-thumb.focus { outline: 2px solid #0073f0; outline-offset: 2px; }
+/* The real inputs: reachable by VoiceOver and keyboard, invisible, not hit by touches. */
+.range-input {
+  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0;
+  opacity: 0; pointer-events: none;
+}
+/* Same height and pill shape as the toggle */
+.morning select, .morning input[type=time] {
+  font: inherit; font-size: 18px; font-weight: 300; color: var(--ink); flex: none;
+  height: 40px; width: 168px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 20px; background: #fff;
+}
+.morning select {
+  -webkit-appearance: none; appearance: none; padding-right: 36px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 14px center;
+}
+.morning-time { display: flex; justify-content: flex-end; }
+.morning-time input:not([hidden]) { margin-top: 10px; }
+#morning-denied { margin-top: 10px; }
+.about { margin: 8px 0 0; padding-top: 18px; border-top: 1px solid rgb(60 65 80 / 0.18); font-size: 15px; text-align: center; color: var(--soft); }
+.about a { color: var(--link); }
+
+/* Wider screens (the website demo): keep it phone-shaped. */
+/* ---- Other screen shapes (layout.js sets the classes) ---- */
+
+/* Today and Tomorrow side by side: iPad, an iPhone Duo opened flat, a phone turned sideways */
+html.two-up .pages { scroll-snap-type: none; overflow-x: hidden; }
+html.two-up .page { flex: 1 1 50%; padding-left: 16px; padding-right: 16px; }
+html.two-up .page.solo { flex-basis: 100%; }
+html.two-up .dots { display: none; }
+html.two-up .penguin-frame { max-width: 520px; }
+
+/* iPhone Duo held like a book: one day on each page, the fold between them */
+html.fold-v .pages { gap: var(--fold-w); }
+html.fold-v .page:first-child { flex: 0 0 var(--fold-a); }
+html.fold-v .page:nth-child(2) { flex: 1 1 0; }
+html.fold-v .page.solo { flex: 1 1 100%; flex-direction: row; padding: 0; }
+html.fold-v .solo .upper { flex: 0 0 var(--fold-a); height: 100%; justify-content: center; padding: 24px; }
+html.fold-v .solo .lower { flex: 1 1 0; height: 100%; justify-content: center; margin-inline-start: var(--fold-w); }
+
+/* iPhone Duo propped up like a laptop: penguins on the upright half, the words on the flat half */
+html.fold-h .page {
+  display: grid;
+  grid-template-rows: var(--fold-a) var(--fold-w) 1fr;
+  justify-items: center;
+  padding: 0;
+}
+html.fold-h .upper { grid-row: 1; height: 100%; padding: calc(env(safe-area-inset-top) + 8px) 16px 8px; }
+html.fold-h .lower { grid-row: 3; align-self: start; padding: 16px 16px calc(env(safe-area-inset-bottom) + 40px); }
+html.fold-h .page.solo { flex-basis: 100%; }
+html.fold-h .solo .lower { align-self: center; padding-bottom: 0; }
+
+/* Big screens (iPad): bigger type to match the bigger penguins */
+@media (min-width: 900px) and (min-height: 800px) {
+  .title { font-size: 30px; }
+  .place { font-size: 21px; }
+  .temp { font-size: 110px; }
+  .high, .summary { font-size: 28px; }
+  .gear { width: 56px; height: 56px; }
+  .attribution { font-size: 14px; }
+}
+
+/* Short screens (a phone turned sideways): smaller numbers so the penguin keeps some room */
+@media (max-height: 520px) {
+  .place { display: none; }
+  .temp { font-size: 52px; }
+  .high, .summary { font-size: 18px; }
+  .summary { margin-top: 4px; }
+  .page { padding-bottom: calc(env(safe-area-inset-bottom) + 34px); }
+}
+
+.settings-attribution:not(:empty) + .about { border-top: 0; padding-top: 4px; }
+
+/* Narrow (large text sizes on an iPhone, Slide Over): each setting's control goes under its title, full width */
+@media (max-width: 340px) {
+  .row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .toggle { width: 100%; }
+  .morning select, .morning input[type=time] { width: 100%; }
+  .morning-time { justify-content: stretch; }
+}

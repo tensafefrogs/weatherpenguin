@@ -1,0 +1,133 @@
+# Releases the iOS app from app/ios/release.json, so a release is a commit (by a person or by Claude) rather than clicks in
+# App Store Connect. Adapted from tensafefrogs/king-walk.
+#
+# App Store Connect. When app/ios/release.json changes on main:
+#   1. if "build" is true, builds the app from main and uploads it (the iOS app workflow, as version "version")
+#   2. app/ios/store/release.py release: waits for processing, then TestFlight groups, the App Store version, the listing,
+#      submission for review and release, as the file asks
+#   3. app/ios/store/release.py status: writes app/ios/store/status.md and commits it
+# Every 6 hours it refreshes the status, and goes ahead with an App Store step that was waiting for another version
+# to get through review (only one version can be in review at a time). Fields and examples: README.md, "Releasing".
+name: App Store release
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/ios/release.json']
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      status_only:
+        description: Only check where the app stands (and do a waiting App Store step), like the 6-hourly run
+        type: boolean
+        default: false
+      beta:
+        description: Build app/ios/beta.json's version for TestFlight only (never the App Store; release.json is left alone)
+        type: boolean
+        default: false
+
+concurrency:
+  group: app-store-release
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      build: ${{ steps.read.outputs.build }}
+      version: ${{ steps.read.outputs.version }}
+      xcode27: ${{ steps.read.outputs.xcode27 }}
+      act: ${{ steps.read.outputs.act }}
+      beta: ${{ steps.read.outputs.beta }}
+      ready: ${{ steps.read.outputs.ready }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: read
+        env:
+          EVENT: ${{ github.event_name }}
+          # nothing to do until the App Store Connect secrets are set (README.md, Releasing)
+          READY: ${{ secrets.ASC_KEY_P8 != '' && vars.BUNDLE_ID != '' }}
+          # which of the settings are there (yes/no only, never the values), so a skipped run says what's missing
+          HAVE: "ASC_KEY_ID=${{ secrets.ASC_KEY_ID != '' }} ASC_ISSUER_ID=${{ secrets.ASC_ISSUER_ID != '' }} ASC_KEY_P8=${{ secrets.ASC_KEY_P8 != '' }} APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID != '' || vars.APPLE_TEAM_ID != '' }} BUNDLE_ID=${{ vars.BUNDLE_ID != '' }}"
+          STATUS_ONLY: ${{ inputs.status_only }}
+          BETA: ${{ inputs.beta }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          beta = os.environ.get('BETA') == 'true'
+          c = json.load(open('app/ios/beta.json' if beta else 'app/ios/release.json'))
+          act = os.environ['EVENT'] != 'schedule' and os.environ.get('STATUS_ONLY') != 'true'   # the schedule only reports status
+          print('build=' + str(bool(act and (beta or c.get('build')))).lower())
+          print('beta=' + str(beta).lower())
+          print('version=' + c['version'])
+          print('xcode27=' + str(c.get('xcode27', True)).lower())
+          print('act=' + str(act).lower())
+          print('ready=' + os.environ['READY'])
+          missing = [kv.split('=')[0] for kv in os.environ['HAVE'].split() if kv.endswith('=false')]
+          if missing:   # to the log (stderr), not the step's outputs
+              import sys
+              print('::warning::Not set yet: ' + ', '.join(missing) + ' (README.md, Releasing). Nothing is built or uploaded until they are.', file=sys.stderr)
+          PY
+          cat "$GITHUB_OUTPUT"
+      # Log in to App Store Connect with the key before anything is built, so a wrong key fails in seconds
+      - name: Check the App Store Connect key
+        if: steps.read.outputs.ready == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID || vars.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID || vars.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          BUNDLE_ID: ${{ vars.BUNDLE_ID }}
+        run: |
+          pip install -q pyjwt cryptography
+          cd app/ios/store && python3 check_key.py
+
+  build:
+    needs: plan
+    if: needs.plan.outputs.build == 'true' && needs.plan.outputs.ready == 'true'
+    uses: ./.github/workflows/ios.yml
+    with:
+      upload: true
+      xcode27: ${{ needs.plan.outputs.xcode27 == 'true' }}
+      version: ${{ needs.plan.outputs.version }}
+    secrets: inherit
+
+  release:
+    needs: [plan, build]
+    # runs when the build succeeded or wasn't asked for
+    if: always() && needs.plan.result == 'success' && needs.plan.outputs.ready == 'true' && (needs.build.result == 'success' || needs.build.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write   # to commit app/ios/store/status.md
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID || vars.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID || vars.ASC_ISSUER_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+      BUNDLE_ID: ${{ vars.BUNDLE_ID }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: pip install pyjwt cryptography
+      - name: TestFlight only (app/ios/beta.json)
+        if: needs.plan.outputs.act == 'true' && needs.plan.outputs.beta == 'true'
+        run: python3 app/ios/store/release.py beta ${{ needs.build.outputs.build_number && format('--build-number {0}', needs.build.outputs.build_number) || '' }}
+      - name: Release
+        if: needs.plan.outputs.act == 'true' && needs.plan.outputs.beta != 'true'
+        run: python3 app/ios/store/release.py release ${{ needs.build.outputs.build_number && format('--build-number {0}', needs.build.outputs.build_number) || '' }}
+      - name: An App Store submission that waited for another version
+        if: github.event_name == 'schedule' || inputs.status_only
+        run: python3 app/ios/store/release.py pending
+      - name: Status
+        if: always()
+        run: python3 app/ios/store/release.py status
+      - name: Commit the status
+        if: always()
+        run: |
+          git config user.name 'App Store status'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add app/ios/store/status.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'App Store status' -q
+          # a run that finished first may have committed an older status: this one is newer, so it wins (-X theirs in a rebase)
+          for i in 1 2 3; do git pull --rebase -X theirs -q && git push -q && exit 0; sleep 5; done
+          exit 1

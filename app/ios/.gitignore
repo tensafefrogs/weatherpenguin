@@ -1,0 +1,6 @@
+*.xcodeproj/
+build/
+DerivedData/
+*.xcuserstate
+# written by xcodegen from project.yml
+*/Info.plist
