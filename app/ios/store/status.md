@@ -1,6 +1,6 @@
 # App Store status: Weather Penguin
 
-Updated 2026-11-18 01:10 UTC by `app/ios/store/release.py status` (the App Store release workflow, after each release and every 6 hours). Not edited by hand.
+Updated 2026-11-18 13:36 UTC by `app/ios/store/release.py status` (the App Store release workflow, after each release and daily). Not edited by hand.
 
 App Store page: https://apps.apple.com/app/id713690248
 
@@ -22,12 +22,12 @@ No submissions.
 
 | Build | Version | Processing | Uploaded | TestFlight (external) | Groups |
 | --- | --- | --- | --- | --- | --- |
+| 2611181323 | 2.0 | VALID | 2026-11-18 13:35 UTC | READY_FOR_BETA_SUBMISSION | Internal |
 | 2611172110 | 2.0 | VALID | 2026-11-17 21:23 UTC | READY_FOR_BETA_SUBMISSION | Internal |
 | 2611171620 | 2.0 | VALID (expired) | 2026-11-17 16:27 UTC | EXPIRED |  |
 | 2611171535 | 2.0 | VALID (expired) | 2026-11-17 15:43 UTC | EXPIRED |  |
 | 1.3 | 1.3 | VALID (expired) | 2016-09-18 22:55 UTC | EXPIRED |  |
 | 1.2.4 | 1.2.4 | VALID (expired) | 2016-02-15 22:13 UTC | EXPIRED |  |
-| 1.2.3 | 1.2.3 | VALID (expired) | 2015-10-13 01:22 UTC | EXPIRED |  |
 
 ## TestFlight groups
 
