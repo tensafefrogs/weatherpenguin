@@ -20,7 +20,7 @@ import hashlib, json, os, sys
 from asc import ApiError, app as get_app, call, patch, request, upload_parts
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-REQUIRED = {'APP_IPHONE_67', 'APP_IPAD_PRO_3GEN_129'}   # other sets (iPhone Duo, Apple Watch) are skipped with a note if refused
+REQUIRED = {'APP_IPHONE_67', 'APP_IPAD_PRO_3GEN_129', 'IMESSAGE_APP_IPHONE_67', 'IMESSAGE_APP_IPAD_PRO_3GEN_129'}   # Apple requires these (the sticker pack needs its own); others are skipped with a note if refused
 
 
 def app_infos(app_id):

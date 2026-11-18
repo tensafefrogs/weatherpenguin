@@ -21,6 +21,9 @@ const DEVICES = {
   ipad: { viewport: [1032, 1376], scale: 2, shots: [
     { n: 1, q: 'sample=rainLater', c: 'today' }, { n: 2, q: 'sample=hot', c: 'sideBySide' },
     { n: 3, q: 'sample=cold', c: 'handDrawn' }, { n: 4, q: 'sample=warm', settings: true, c: 'settings' }] },
+  // the iMessage sticker pack's own page on the App Store (Apple requires an iPhone and an iPad 13" set for it)
+  imessage: { viewport: [440, 956], scale: 3, shots: [{ n: 1, stickers: 2, c: 'stickers' }] },
+  'imessage-ipad': { viewport: [1032, 1376], scale: 2, shots: [{ n: 1, stickers: 4, c: 'stickers' }] },
   duo: { viewport: [669, 951], scale: 3, shots: [
     { n: 1, q: 'sample=rainLater', c: 'sideBySide' }, { n: 2, q: 'sample=hot&fold=v', c: 'book' },
     { n: 3, q: 'sample=cold&fold=h', viewport: [951, 669], c: 'laptop' }] },
@@ -47,6 +50,25 @@ const server = http.createServer((req, res) => {
 
 // The frame: a flat colour, the caption in Inter (sentence case), and the screen below it with rounded corners and a
 // hairline outline. No gradients or shadows.
+// The eight stickers (app/ios/Stickers, the hand-drawn penguins cropped) as the Messages sticker drawer shows them:
+// a grid on white, `columns` across.
+const STICKERS = path.join(__dirname, '..', 'Stickers', 'Stickers.xcassets', 'Sticker Pack.stickerpack');
+async function stickerSheet(browser, width, height, scale, columns) {
+  const pngs = fs.readdirSync(STICKERS).filter((d) => d.endsWith('.sticker')).sort()
+    .map((d) => fs.readdirSync(path.join(STICKERS, d)).filter((f) => f.endsWith('.png')).map((f) => path.join(STICKERS, d, f))[0]);
+  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: scale });
+  const page = await ctx.newPage();
+  const cell = Math.floor((width - 48) / columns);
+  await page.setContent(`<!doctype html><html><body style="margin:0;height:100vh;background:#fff;display:grid;
+    grid-template-columns:repeat(${columns},${cell}px);justify-content:center;align-content:center;gap:0">
+    ${pngs.map((p) => `<img src="data:image/png;base64,${fs.readFileSync(p).toString('base64')}" style="width:${cell}px;height:${cell}px;object-fit:contain">`).join('')}
+  </body></html>`);
+  await page.waitForFunction(() => [...document.images].every((i) => i.complete));
+  const png = await page.screenshot();
+  await ctx.close();
+  return png;
+}
+
 async function frame(browser, base, width, height, scale, text, png, file) {
   const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: scale });
   const page = await ctx.newPage();
@@ -81,7 +103,9 @@ async function frame(browser, base, width, height, scale, text, png, file) {
     const [width, height] = s.viewport || d.viewport;
     const file = path.join(out, `${device}-${s.n}.png`);
     let screen;
-    if (s.image) {
+    if (s.stickers) {
+      screen = await stickerSheet(browser, width, height, d.scale, s.stickers);
+    } else if (s.image) {
       const src = path.join(__dirname, 'screenshots', s.image, `${LOCALE || 'en-US'}.png`);
       if (!fs.existsSync(src)) { console.log(`skipped ${file}: no ${src} (run the Store widget screenshots workflow)`); continue; }
       screen = fs.readFileSync(src);

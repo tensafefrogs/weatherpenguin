@@ -40,6 +40,12 @@
     "APP_WATCH_ULTRA": [
       "screenshots/watch-1.png",
       "screenshots/watch-2.png"
+    ],
+    "IMESSAGE_APP_IPHONE_67": [
+      "screenshots/imessage-1.png"
+    ],
+    "IMESSAGE_APP_IPAD_PRO_3GEN_129": [
+      "screenshots/imessage-ipad-1.png"
     ]
   },
   "accessibility": {

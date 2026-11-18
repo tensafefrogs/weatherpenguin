@@ -8,7 +8,8 @@
     "handDrawn": "Hand-drawn for every kind of weather",
     "settings": "Choose when the penguin changes clothes",
     "book": "Hold it like a book",
-    "laptop": "Or stand it up like a laptop"
+    "laptop": "Or stand it up like a laptop",
+    "stickers": "Hand-drawn penguin stickers for Messages"
   },
   "de-DE": {
     "today": "Was heute anziehen – auf einen Blick",
@@ -18,7 +19,8 @@
     "handDrawn": "Handgezeichnet für jedes Wetter",
     "settings": "Wähle, wann sich der Pinguin umzieht",
     "book": "Halte es wie ein Buch",
-    "laptop": "Oder stell es auf wie einen Laptop"
+    "laptop": "Oder stell es auf wie einen Laptop",
+    "stickers": "Handgezeichnete Pinguin-Sticker für Nachrichten"
   },
   "fr-FR": {
     "today": "Quoi mettre aujourd’hui, en un coup d’œil",
@@ -28,7 +30,8 @@
     "handDrawn": "Dessiné à la main pour chaque météo",
     "settings": "Choisissez quand le pingouin se change",
     "book": "Tenez-le comme un livre",
-    "laptop": "Ou posez-le comme un ordinateur portable"
+    "laptop": "Ou posez-le comme un ordinateur portable",
+    "stickers": "Des autocollants pingouin dessinés à la main pour Messages"
   },
   "es-ES": {
     "today": "Qué ponerte hoy, de un vistazo",
@@ -38,7 +41,8 @@
     "handDrawn": "Dibujado a mano para todo tipo de tiempo",
     "settings": "Elige cuándo se cambia de ropa el pingüino",
     "book": "Sostenlo como un libro",
-    "laptop": "O apóyalo como un portátil"
+    "laptop": "O apóyalo como un portátil",
+    "stickers": "Stickers de pingüino dibujados a mano para Mensajes"
   },
   "es-MX": {
     "today": "Qué ponerte hoy, de un vistazo",
@@ -48,7 +52,8 @@
     "handDrawn": "Dibujado a mano para todo tipo de clima",
     "settings": "Elige cuándo se cambia de ropa el pingüino",
     "book": "Sostenlo como un libro",
-    "laptop": "O ponlo de pie como una laptop"
+    "laptop": "O ponlo de pie como una laptop",
+    "stickers": "Stickers de pingüino dibujados a mano para Mensajes"
   },
   "it": {
     "today": "Cosa metterti oggi, a colpo d’occhio",
@@ -58,7 +63,8 @@
     "handDrawn": "Disegnato a mano per ogni tempo",
     "settings": "Scegli quando il pinguino si cambia",
     "book": "Tienilo come un libro",
-    "laptop": "O appoggialo come un portatile"
+    "laptop": "O appoggialo come un portatile",
+    "stickers": "Sticker del pinguino disegnati a mano per Messaggi"
   },
   "pt-BR": {
     "today": "O que vestir hoje, num relance",
@@ -68,7 +74,8 @@
     "handDrawn": "Desenhado à mão para todo tipo de tempo",
     "settings": "Escolha quando o pinguim troca de roupa",
     "book": "Segure como um livro",
-    "laptop": "Ou apoie como um notebook"
+    "laptop": "Ou apoie como um notebook",
+    "stickers": "Figurinhas do pinguim desenhadas à mão para o Mensagens"
   },
   "pt-PT": {
     "today": "O que vestir hoje, num relance",
@@ -78,7 +85,8 @@
     "handDrawn": "Desenhado à mão para todo o tipo de tempo",
     "settings": "Escolha quando o pinguim muda de roupa",
     "book": "Segure-o como um livro",
-    "laptop": "Ou apoie-o como um portátil"
+    "laptop": "Ou apoie-o como um portátil",
+    "stickers": "Autocolantes do pinguim desenhados à mão para a app Mensagens"
   },
   "nl-NL": {
     "today": "Wat trek je vandaag aan? In één oogopslag",
@@ -88,7 +96,8 @@
     "handDrawn": "Met de hand getekend voor elk weer",
     "settings": "Kies wanneer de pinguïn zich omkleedt",
     "book": "Houd hem vast als een boek",
-    "laptop": "Of zet hem neer als een laptop"
+    "laptop": "Of zet hem neer als een laptop",
+    "stickers": "Handgetekende pinguïnstickers voor Berichten"
   },
   "sv": {
     "today": "Vad du ska ha på dig i dag, med en blick",
@@ -98,7 +107,8 @@
     "handDrawn": "Handritad för alla sorters väder",
     "settings": "Välj när pingvinen byter kläder",
     "book": "Håll den som en bok",
-    "laptop": "Eller ställ den som en laptop"
+    "laptop": "Eller ställ den som en laptop",
+    "stickers": "Handritade pingvinstickers för Meddelanden"
   },
   "da": {
     "today": "Hvad du skal have på i dag, med ét blik",
@@ -108,7 +118,8 @@
     "handDrawn": "Håndtegnet til alt slags vejr",
     "settings": "Vælg, hvornår pingvinen skifter tøj",
     "book": "Hold den som en bog",
-    "laptop": "Eller stil den op som en bærbar"
+    "laptop": "Eller stil den op som en bærbar",
+    "stickers": "Håndtegnede pingvinstickers til Beskeder"
   },
   "no": {
     "today": "Hva du skal ha på deg i dag, med ett blikk",
@@ -118,7 +129,8 @@
     "handDrawn": "Håndtegnet for all slags vær",
     "settings": "Velg når pingvinen bytter klær",
     "book": "Hold den som en bok",
-    "laptop": "Eller sett den opp som en bærbar"
+    "laptop": "Eller sett den opp som en bærbar",
+    "stickers": "Håndtegnede pingvinklistremerker for Meldinger"
   },
   "fi": {
     "today": "Mitä laittaa päälle tänään, yhdellä silmäyksellä",
@@ -128,7 +140,8 @@
     "handDrawn": "Käsin piirretty kaikenlaiseen säähän",
     "settings": "Valitse, milloin pingviini vaihtaa vaatteita",
     "book": "Pidä sitä kuin kirjaa",
-    "laptop": "Tai seisota se kuin kannettava"
+    "laptop": "Tai seisota se kuin kannettava",
+    "stickers": "Käsin piirretyt pingviinitarrat Viesteihin"
   },
   "pl": {
     "today": "Co założyć dziś – w mgnieniu oka",
@@ -138,7 +151,8 @@
     "handDrawn": "Rysowany ręcznie na każdą pogodę",
     "settings": "Wybierz, kiedy pingwin się przebiera",
     "book": "Trzymaj go jak książkę",
-    "laptop": "Albo postaw jak laptopa"
+    "laptop": "Albo postaw jak laptopa",
+    "stickers": "Ręcznie rysowane naklejki z pingwinem do Wiadomości"
   },
   "ru": {
     "today": "Что надеть сегодня — с одного взгляда",
@@ -148,7 +162,8 @@
     "handDrawn": "Нарисован от руки для любой погоды",
     "settings": "Выберите, когда пингвин переодевается",
     "book": "Держите как книгу",
-    "laptop": "Или поставьте как ноутбук"
+    "laptop": "Или поставьте как ноутбук",
+    "stickers": "Нарисованные от руки стикеры с пингвином для «Сообщений»"
   },
   "ja": {
     "today": "今日何を着るか、ひと目でわかる",
@@ -158,7 +173,8 @@
     "handDrawn": "どんな天気も手描きで",
     "settings": "ペンギンが着替える気温を選べる",
     "book": "本のように持って",
-    "laptop": "ノートパソコンのように立てても"
+    "laptop": "ノートパソコンのように立てても",
+    "stickers": "メッセージで使える手描きのペンギンステッカー"
   },
   "ko": {
     "today": "오늘 뭘 입을지 한눈에",
@@ -168,7 +184,8 @@
     "handDrawn": "모든 날씨를 손그림으로",
     "settings": "펭귄이 옷을 갈아입는 기온을 선택하세요",
     "book": "책처럼 들고",
-    "laptop": "노트북처럼 세워서도"
+    "laptop": "노트북처럼 세워서도",
+    "stickers": "메시지에서 쓰는 손그림 펭귄 스티커"
   },
   "zh-Hans": {
     "today": "今天穿什么，一眼就知道",
@@ -178,7 +195,8 @@
     "handDrawn": "手绘每一种天气",
     "settings": "选择企鹅何时换衣服",
     "book": "像书一样拿着",
-    "laptop": "或像笔记本电脑一样立起来"
+    "laptop": "或像笔记本电脑一样立起来",
+    "stickers": "可在“信息”中使用的手绘企鹅贴纸"
   },
   "zh-Hant": {
     "today": "今天穿什麼，一眼就知道",
@@ -188,6 +206,7 @@
     "handDrawn": "手繪每一種天氣",
     "settings": "選擇企鵝何時換衣服",
     "book": "像書一樣拿著",
-    "laptop": "或像筆電一樣立起來"
+    "laptop": "或像筆電一樣立起來",
+    "stickers": "可在「訊息」中使用的手繪企鵝貼圖"
   }
 }
