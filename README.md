@@ -133,7 +133,7 @@ Until the secrets are set, the release workflow does nothing but say what's miss
 - `release_now`: release a version that's approved and waiting for a manual release.
 
 Push it to `main` and the **App Store release** workflow runs it, then writes `app/ios/store/status.md`
-(versions, App Review state, builds, TestFlight groups) and commits it; it refreshes that every 6 hours.
+(versions, App Review state, builds, TestFlight groups) and commits it; it refreshes that once a day.
 `app/ios/beta.json` plus Actions → App Store release → Run workflow ("beta") makes a TestFlight-only build of
 the next version without touching what release.json is doing. Build numbers are the UTC date and time.
 

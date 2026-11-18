@@ -13,7 +13,7 @@ usage: python3 app/ios/store/release.py status
            uploads the listing (upload_listing.py), submits the version for review, and releases it when asked.
            --build-number is the build just uploaded; without it, the newest processed build for the version.
            While another version is in review (or approved and not yet out), the App Store step waits.
-  pending  the App Store step that waited, once the other version is out (the workflow runs it every 6 hours)
+  pending  the App Store step that waited, once the other version is out (the workflow runs it daily)
 Credentials as in asc.py. The release workflow (.github/workflows/release.yml) runs both.
 
 Not covered by the API: App Review's messages (Resolution Center) and replies to them, App Privacy answers.
@@ -285,9 +285,9 @@ def other_version(app_id, version, states):
 def app_store(app_id, build, cfg):
     version = cfg['version']
     busy = other_version(app_id, version, BUSY)
-    if busy:   # the 6-hourly run (pending) carries on once it's through
+    if busy:   # the daily run (pending) carries on once it's through
         log(f"App Store: version {busy['attributes']['versionString']} is {vstate(busy)}, so {version} waits; "
-            'it goes ahead on the first 6-hourly run after that version is out of review and released')
+            'it goes ahead on the first daily run after that version is out of review and released')
         return
     release_type = 'AFTER_APPROVAL' if cfg.get('release') == 'after_approval' else 'MANUAL'
     v = app_store_version(app_id, version, release_type)
@@ -345,7 +345,7 @@ def status():
     a = get_app(); app_id = a['id']
     lines = [f"# App Store status: {a['attributes']['name']}", '',
              f"Updated {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} by `app/ios/store/release.py status` "
-             '(the App Store release workflow, after each release and every 6 hours). Not edited by hand.', '',
+             '(the App Store release workflow, after each release and daily). Not edited by hand.', '',
              f'App Store page: https://apps.apple.com/app/id{app_id}', '',
              '## Versions', '', '| Version | State | Release | Build |', '| --- | --- | --- | --- |']
     vr = versions(app_id)
@@ -402,13 +402,13 @@ def status():
     new = '\n'.join(lines) + '\n'
     same = lambda t: [l for l in t.splitlines() if not l.startswith('Updated ')]
     old = open(out).read() if os.path.exists(out) else ''
-    if same(old) != same(new):   # rewrite only when something changed, so the 6-hourly check doesn't commit noise
+    if same(old) != same(new):   # rewrite only when something changed, so the daily check doesn't commit noise
         open(out, 'w').write(new)
     log(new)
 
 
 def pending():
-    """The 6-hourly run: an App Store step that waited for another version to get through review and release.
+    """The daily run: an App Store step that waited for another version to get through review and release.
     Acts only while this version doesn't exist yet or is still being prepared, so it never resubmits a rejection."""
     cfg = json.load(open(os.path.join(ROOT, 'app', 'ios', 'release.json')))
     store = cfg.get('app_store')
@@ -417,7 +417,7 @@ def pending():
     v = next((x for x in versions(app_id)['data'] if x['attributes']['versionString'] == version), None)
     if v and vstate(v) != 'PREPARE_FOR_SUBMISSION': return
     # a version already being prepared only waits for something when it's to be submitted; otherwise there's nothing
-    # to do, and redoing the listing every 6 hours would replace its screenshots four times a day for nothing
+    # to do, and redoing the listing on every daily run would replace its screenshots for nothing
     if v and not store.get('submit'): return
     if other_version(app_id, version, BUSY): return
     rejected = other_version(app_id, version, REJECTED)

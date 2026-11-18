@@ -6,7 +6,7 @@
 #   2. app/ios/store/release.py release: waits for processing, then TestFlight groups, the App Store version, the listing,
 #      submission for review and release, as the file asks
 #   3. app/ios/store/release.py status: writes app/ios/store/status.md and commits it
-# Every 6 hours it refreshes the status, and goes ahead with an App Store step that was waiting for another version
+# Once a day it refreshes the status, and goes ahead with an App Store step that was waiting for another version
 # to get through review (only one version can be in review at a time). Fields and examples: README.md, "Releasing".
 name: App Store release
 
@@ -15,11 +15,11 @@ on:
     branches: [main]
     paths: ['app/ios/release.json']
   schedule:
-    - cron: '17 */6 * * *'
+    - cron: '17 19 * * *'   # daily, 19:17 UTC (late morning in California)
   workflow_dispatch:
     inputs:
       status_only:
-        description: Only check where the app stands (and do a waiting App Store step), like the 6-hourly run
+        description: Only check where the app stands (and do a waiting App Store step), like the daily run
         type: boolean
         default: false
       beta:
