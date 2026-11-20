@@ -101,6 +101,7 @@ final class AppModel: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
       sendFold(force: true)
       send("onSettings", Settings.load())
       refresh()
+      countWidgets()
     case "refresh":
       refresh()
     case "saveSettings":
@@ -132,6 +133,24 @@ final class AppModel: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
       await UIApplication.shared.open(url)
     }
     return .cancel
+  }
+
+  // MARK: Counts
+
+  /// Which kinds of Weather Penguin widget are on this phone's Home Screen and Lock Screen, once per launch
+  /// (docs/STATS.md): asked here, so the widgets themselves never send anything.
+  private func countWidgets() {
+    WidgetCenter.shared.getCurrentConfigurations { result in
+      guard case .success(let widgets) = result else { return }
+      let names: [WidgetFamily: String] = [
+        .systemSmall: "small", .systemMedium: "medium", .accessoryCircular: "lock-circular",
+        .accessoryRectangular: "lock-rectangular", .accessoryInline: "lock-inline",
+      ]
+      if widgets.isEmpty { Stats.count("widget/none") }
+      for w in widgets {
+        Stats.count("widget/" + (names[w.family] ?? "other") + (w.kind == "TodayTomorrow" ? "-two-day" : ""))
+      }
+    }
   }
 
   // MARK: iPhone Duo fold

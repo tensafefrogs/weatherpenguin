@@ -10,11 +10,12 @@ options:
 settings:
   base:
     DEVELOPMENT_TEAM: K37CSPL839
-    MARKETING_VERSION: "2.0"
+    MARKETING_VERSION: "2.0.1"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
     TARGETED_DEVICE_FAMILY: "1,2"   # iPhone (iPhone Duo included) and iPad
     CODE_SIGN_STYLE: Automatic
+    WP_GOATCOUNTER: ""   # the GoatCounter count URL for native counts (Shared/Stats.swift); set by upload.sh
 targets:
   WeatherPenguin:
     type: application
@@ -45,6 +46,7 @@ targets:
       properties:
         CFBundleDisplayName: Weather Penguin
         CFBundleShortVersionString: $(MARKETING_VERSION)
+        WPGoatCounter: $(WP_GOATCOUNTER)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDevelopmentRegion: en
         # The languages the app has (web/app/lang and the .lproj folders): iOS gives the web UI the
@@ -53,6 +55,7 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         LSApplicationCategoryType: public.app-category.weather
         NSLocationWhenInUseUsageDescription: Weather Penguin uses your location to check the weather where you are.
+        NSLocationDefaultAccuracyReduced: true   # approximate location only (a few km): enough for the weather
         UILaunchScreen:
           UIColorName: Sky
         # Sideways too: iPhone Duo's inner screen propped up like a laptop is landscape, and an iPad goes any way
@@ -102,6 +105,7 @@ targets:
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations: [en, da, de, es, fi, fr, it, ja, ko, nb, nl, pl, pt-BR, pt-PT, ru, sv, zh-Hans, zh-Hant]
         NSWidgetWantsLocation: true
+        NSLocationDefaultAccuracyReduced: true   # approximate location only (a few km): enough for the weather
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
 
@@ -180,6 +184,7 @@ targets:
       properties:
         CFBundleDisplayName: Weather Penguin
         CFBundleShortVersionString: $(MARKETING_VERSION)
+        WPGoatCounter: $(WP_GOATCOUNTER)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations: [en, da, de, es, fi, fr, it, ja, ko, nb, nl, pl, pt-BR, pt-PT, ru, sv, zh-Hans, zh-Hant]
@@ -187,6 +192,7 @@ targets:
         WKCompanionAppBundleIdentifier: com.weatherpenguin.WeatherPenguin
         WKRunsIndependentlyOfCompanionApp: true
         NSLocationWhenInUseUsageDescription: Weather Penguin uses your location to check the weather where you are.
+        NSLocationDefaultAccuracyReduced: true   # approximate location only (a few km): enough for the weather
 
   # Watch face complications
   WatchWidgets:
@@ -219,5 +225,6 @@ targets:
         CFBundleLocalizations: [en, da, de, es, fi, fr, it, ja, ko, nb, nl, pl, pt-BR, pt-PT, ru, sv, zh-Hans, zh-Hant]
         NSWidgetWantsLocation: true
         NSLocationWhenInUseUsageDescription: Weather Penguin uses your location to check the weather where you are.
+        NSLocationDefaultAccuracyReduced: true   # approximate location only (a few km): enough for the weather
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension

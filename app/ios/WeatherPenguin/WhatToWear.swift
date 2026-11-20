@@ -11,6 +11,7 @@ struct WhatToWearIntent: AppIntent {
 
   @MainActor
   func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
+    Stats.count("siri/what-to-wear", once: false)
     let settings = PenguinSettings.fromApp()
     do {
       // Siri may run this while the app is in the background, where a new fix can be refused: a fix the

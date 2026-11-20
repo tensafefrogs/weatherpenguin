@@ -1,9 +1,14 @@
 import SwiftUI
+import UserNotifications
 
 @main
 struct WeatherPenguinApp: App {
   @State private var model = AppModel()
   @Environment(\.scenePhase) private var scenePhase
+
+  init() {
+    UNUserNotificationCenter.current().delegate = MorningTaps.shared
+  }
 
   var body: some Scene {
     WindowGroup {
@@ -14,5 +19,15 @@ struct WeatherPenguinApp: App {
           if phase == .active { model.refreshIfStale() }
         }
     }
+  }
+}
+
+/// Counts a tap on the morning notification (docs/STATS.md). Only taps: nothing runs when one is merely delivered.
+/// Without willPresent, a notification that arrives while the app is open isn't shown, as before.
+final class MorningTaps: NSObject, UNUserNotificationCenterDelegate {
+  static let shared = MorningTaps()
+
+  func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+    if response.notification.request.identifier.hasPrefix("morning-") { Stats.count("morning/opened", once: false) }
   }
 }

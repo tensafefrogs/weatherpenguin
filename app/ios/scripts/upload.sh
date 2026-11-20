@@ -49,6 +49,7 @@ xcodebuild -project "$project" -scheme WeatherPenguin -configuration Release \
   DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
   SWIFT_ACTIVE_COMPILATION_CONDITIONS="\$(inherited) ${SWIFT_FLAGS:-}" \
   ${MARKETING_VERSION:+MARKETING_VERSION="$MARKETING_VERSION"} \
+  WP_GOATCOUNTER="${GOATCOUNTER_URL:-}" \
   "${signing[@]}" archive
 
 app_in_archive="$archive/Products/Applications/WeatherPenguin.app"

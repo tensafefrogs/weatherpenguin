@@ -111,4 +111,5 @@ jobs:
           BUILD_NUMBER: ${{ steps.number.outputs.build_number }}
           MARKETING_VERSION: ${{ inputs.version }}
           ARCHIVE_SIGNING: ${{ vars.ARCHIVE_SIGNING }}
+          GOATCOUNTER_URL: ${{ vars.GOATCOUNTER_URL }}   # native counts (Shared/Stats.swift), as config.js for the page
         run: app/ios/scripts/upload.sh

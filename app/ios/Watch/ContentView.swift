@@ -23,7 +23,10 @@ struct ContentView: View {
         .tabViewStyle(.verticalPage)
       }
     }
-    .task { await model.refresh() }
+    .task {
+      Stats.count("watch/open")
+      await model.refresh()
+    }
   }
 }
 
