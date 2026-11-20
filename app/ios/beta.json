@@ -1,10 +1,10 @@
 {
-  "version": "2.0",
+  "version": "2.0.1",
   "xcode27": true,
   "testflight": {
     "groups": [
       "Internal"
     ],
-    "whats_new": "Fixes before the App Store release:\n- Lock Screen: the advice no longer cuts off\n- Settings from 1.3 now reach the widgets and Apple Watch\n- The morning notification is no longer cancelled when the app opens offline\n- With Location Services off, the app says so\n- City name lookup moved to Apple's newer API"
+    "whats_new": "2.0.1, not yet submitted:\n- Location: iOS now gives the app only an approximate location. Check the permission prompt has no Precise switch and the forecast and city name still look right.\n- Anonymous counts for the widgets, Apple Watch app, Siri and morning notification taps."
   }
 }
