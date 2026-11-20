@@ -207,6 +207,11 @@ Spotlight and the Action button's list. Phrases and titles are translated in eac
 Anonymous usage counts go to GoatCounter when `GOATCOUNTER_URL` is set (web/app/stats.js). `docs/STATS.md` lists
 every event and how to read it.
 
+`python3 -I tools/weekly_report.py` prints a week's usage (from GoatCounter's API, with a read-only token in
+`GOATCOUNTER_TOKEN`), the App Store ratings per storefront and the week's written reviews (from Apple's public
+feeds, no key). Downloads aren't in it: they need an App Store Connect key with the Sales and Reports role. The
+report is for the owner; don't commit its output (reviews are people's words).
+
 ## Website
 
 `.github/workflows/pages.yml` publishes `web/` to GitHub Pages on every push to `main` that changes it (and when
