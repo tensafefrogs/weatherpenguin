@@ -84,8 +84,12 @@ def main():
 
     # Age rating: every question None (or No), except the ones listed in listing.json
     decl = call('GET', f"/v1/appInfos/{info['id']}/ageRatingDeclaration")['data']
+    # yes/no questions get False, the others NONE. Apple turns questions into yes/no now and then (dating and shared
+    # location did in November 2026): a question it already answers with true/false counts as yes/no too.
     yes_no = {'advertising', 'gambling', 'lootBox', 'messagingAndChat', 'parentalControls', 'ageAssurance', 'unrestrictedWebAccess',
-              'userGeneratedContent', 'healthOrWellnessTopics', 'socialMedia', 'socialMediaAgeRestricted'}
+              'userGeneratedContent', 'healthOrWellnessTopics', 'socialMedia', 'socialMediaAgeRestricted',
+              'datingAndRelationships', 'sharedLocation'}
+    yes_no |= {k for k, v in decl['attributes'].items() if isinstance(v, bool)}
     skip = {'kidsAgeBand', 'ageRatingOverride', 'ageRatingOverrideV2', 'koreaAgeRatingOverride', 'gracRatingClassificationNumber',
             'developerAgeRatingInfoUrl'}
     answers = {k: (False if k in yes_no else 'NONE') for k in decl['attributes'] if k not in skip}
