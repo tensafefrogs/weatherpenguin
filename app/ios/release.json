@@ -1,9 +1,33 @@
 {
-  "version": "2.0",
+  "version": "2.0.1",
   "xcode27": true,
   "build": false,
   "testflight": null,
-  "app_store": null,
-  "release_now": true,
-  "note": "2.0: approved by App Review on 2026-11-18; released at once, as the owner asked (release as soon as it's approved)."
+  "app_store": {
+    "submit": true,
+    "release": "after_approval",
+    "whats_new": {
+      "en-US": "Weather Penguin now only asks for your approximate location: an area a few kilometres across, never your exact position. The forecast is just as good.",
+      "de-DE": "Weather Penguin fragt jetzt nur noch nach deinem ungefähren Standort: einem Gebiet von ein paar Kilometern, nie nach deiner genauen Position. Die Vorhersage bleibt genauso gut.",
+      "fr-FR": "Weather Penguin ne demande plus que votre position approximative : une zone de quelques kilomètres, jamais votre position exacte. Les prévisions restent aussi bonnes.",
+      "es-ES": "Weather Penguin ahora solo pide tu ubicación aproximada: una zona de unos pocos kilómetros, nunca tu posición exacta. El pronóstico es igual de bueno.",
+      "es-MX": "Weather Penguin ahora solo pide tu ubicación aproximada: una zona de unos cuantos kilómetros, nunca tu posición exacta. El pronóstico es igual de bueno.",
+      "it": "Weather Penguin ora chiede solo la tua posizione approssimativa: un'area di pochi chilometri, mai la tua posizione esatta. Le previsioni restano altrettanto buone.",
+      "pt-BR": "O Weather Penguin agora pede só a sua localização aproximada: uma área de alguns quilômetros, nunca a sua posição exata. A previsão continua igualmente boa.",
+      "pt-PT": "O Weather Penguin agora pede apenas a sua localização aproximada: uma área de alguns quilómetros, nunca a sua posição exata. A previsão continua igualmente boa.",
+      "nl-NL": "Weather Penguin vraagt nu alleen nog om je globale locatie: een gebied van een paar kilometer, nooit je exacte positie. De voorspelling blijft net zo goed.",
+      "sv": "Weather Penguin frågar nu bara efter din ungefärliga plats: ett område på några kilometer, aldrig din exakta position. Prognosen är lika bra.",
+      "da": "Weather Penguin spørger nu kun om din omtrentlige placering: et område på nogle få kilometer, aldrig din præcise position. Vejrudsigten er lige så god.",
+      "no": "Weather Penguin spør nå bare om omtrentlig posisjon: et område på noen få kilometer, aldri din nøyaktige posisjon. Værmeldingen er like god.",
+      "fi": "Weather Penguin pyytää nyt vain likimääräistä sijaintiasi: muutaman kilometrin alueen, ei koskaan tarkkaa sijaintia. Ennuste on yhtä hyvä.",
+      "pl": "Weather Penguin prosi teraz tylko o przybliżoną lokalizację: obszar kilku kilometrów, nigdy dokładną pozycję. Prognoza jest równie dobra.",
+      "ru": "Теперь Weather Penguin запрашивает только примерное местоположение: область в несколько километров, а не точное положение. Прогноз так же точен.",
+      "ja": "Weather Penguinは、おおよその位置情報（数キロメートルの範囲）だけを使うようになりました。正確な位置は使いません。天気予報の精度は変わりません。",
+      "ko": "이제 Weather Penguin은 대략적인 위치(몇 킬로미터 범위)만 요청하며, 정확한 위치는 사용하지 않습니다. 예보는 똑같이 정확합니다.",
+      "zh-Hans": "Weather Penguin 现在只请求你的大致位置：几公里范围内的区域，绝不是你的精确位置。天气预报同样准确。",
+      "zh-Hant": "Weather Penguin 現在只會要求你的大概位置：幾公里範圍內的區域，絕不是你的精確位置。天氣預報同樣準確。"
+    }
+  },
+  "release_now": false,
+  "note": "2.0.1: submitted with the owner's explicit go-ahead (2026-11-20): build 2611200015 (tested on TestFlight), approximate location only, native counts. Released automatically after approval."
 }
