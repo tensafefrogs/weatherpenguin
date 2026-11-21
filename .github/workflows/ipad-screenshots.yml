@@ -1,0 +1,60 @@
+# The app itself (WKWebView, so Safari's layout engine) on iPad simulators of each size, with sample weather
+# (the debug build's launch arguments -sample <name>), in portrait: iPads are wide enough for Today and Tomorrow side
+# by side either way. tools/screenshot.cjs uses Chromium, which lays some things out differently from Safari; run
+# this after changing layout and look at the pictures (the run's "ipad-screenshots" artifact; nothing is committed).
+name: iPad screenshots
+on:
+  workflow_dispatch:
+    inputs:
+      sample:
+        description: Sample weather (rainLater, hot, cold, warm, rainNow)
+        default: warm
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: read
+jobs:
+  shots:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the app for the simulator
+        run: |
+          brew install xcodegen
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
+          cd app/ios && xcodegen generate
+          xcodebuild build -project WeatherPenguin.xcodeproj -scheme WeatherPenguin -configuration Debug \
+            -destination "generic/platform=iOS Simulator" -derivedDataPath build CODE_SIGNING_ALLOWED=NO > build.log 2>&1 \
+            || { grep -E 'error:' build.log | sort -u | head -40; tail -40 build.log; exit 1; }
+      - name: Screenshots
+        env:
+          SAMPLE: ${{ inputs.sample }}
+        run: |
+          cd app/ios
+          case "$SAMPLE" in rainLater|hot|cold|warm|rainNow) ;; *) echo "unknown sample"; exit 1;; esac
+          app=$(find build -name 'WeatherPenguin.app' -path '*iphonesimulator*' | head -1)
+          runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='iOS' and x['isAvailable']]; print(r[-1]['identifier'])")
+          xcrun simctl list devicetypes | grep '^iPad' || true
+          mkdir -p shots
+          # one of each size: mini, the plain iPad, 11-inch and 13-inch (the newest of each name the runner has)
+          for pattern in 'iPad mini.*' 'iPad \(A?\d+.*\)' 'iPad (Air|Pro) 11-inch.*' 'iPad Pro 13-inch.*'; do
+            devtype=$(xcrun simctl list devicetypes -j | python3 -c "import json,re,sys; d=[x for x in json.load(sys.stdin)['devicetypes'] if re.fullmatch(r'''$pattern''', x['name'])]; print(d[-1]['identifier'] if d else '')")
+            [ -n "$devtype" ] || { echo "no device for $pattern"; continue; }
+            name=$(echo "$devtype" | sed 's/.*SimDeviceType\.//')
+            udid=$(xcrun simctl create "$name" "$devtype" "$runtime")
+            xcrun simctl boot "$udid"; xcrun simctl bootstatus "$udid" -b
+            xcrun simctl status_bar "$udid" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 || true
+            xcrun simctl install "$udid" "$app"
+            sleep 20   # boot banners pass
+            xcrun simctl launch "$udid" com.weatherpenguin.WeatherPenguin -sample "$SAMPLE" -tour false
+            sleep 8
+            xcrun simctl io "$udid" screenshot "shots/$name.png"
+            xcrun simctl shutdown "$udid"; xcrun simctl delete "$udid"
+          done
+          ls -l shots
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ipad-screenshots
+          path: app/ios/shots
