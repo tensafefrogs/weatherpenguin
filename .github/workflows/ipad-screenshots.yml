@@ -17,7 +17,7 @@ permissions:
 jobs:
   shots:
     runs-on: macos-26
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
       - name: Build the app for the simulator
@@ -37,10 +37,8 @@ jobs:
           app=$(find build -name 'WeatherPenguin.app' -path '*iphonesimulator*' | head -1)
           runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='iOS' and x['isAvailable']]; print(r[-1]['identifier'])")
           mkdir -p shots
-          # one of each width (points, portrait): mini 744, iPad (A16) 820, Air 11-inch 820, Pro 11-inch 834 (2018-2022)
-          # and 834 (M4), Pro 13-inch 1032
-          for name in 'iPad mini (A17 Pro)' 'iPad (A16)' 'iPad Air 11-inch (M4)' 'iPad Pro (11-inch) (4th generation)' \
-                      'iPad Pro 11-inch (M4)' 'iPad Pro 13-inch (M4)'; do
+          # the smallest, an 11-inch (2018-2022: 834 x 1194) and the biggest
+          for name in 'iPad mini (A17 Pro)' 'iPad Pro (11-inch) (4th generation)' 'iPad Pro 13-inch (M4)'; do
             udid=$(xcrun simctl create "$name" "$name" "$runtime") || { echo "no simulator for $name"; continue; }
             xcrun simctl boot "$udid"; xcrun simctl bootstatus "$udid" -b
             xcrun simctl status_bar "$udid" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 || true
