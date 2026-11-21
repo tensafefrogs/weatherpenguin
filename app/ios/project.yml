@@ -10,7 +10,7 @@ options:
 settings:
   base:
     DEVELOPMENT_TEAM: K37CSPL839
-    MARKETING_VERSION: "2.0.1"
+    MARKETING_VERSION: "2.0.2"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "5.0"
     TARGETED_DEVICE_FAMILY: "1,2"   # iPhone (iPhone Duo included) and iPad
