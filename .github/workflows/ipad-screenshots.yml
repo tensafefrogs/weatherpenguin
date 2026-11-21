@@ -1,7 +1,7 @@
 # The app itself (WKWebView, so Safari's layout engine) on iPad simulators of each size, with sample weather
 # (the debug build's launch arguments -sample <name>), in portrait and turned to landscape after loading (-rotate
-# landscape): iPads are wide enough for Today and Tomorrow side by side either way. tools/screenshot.cjs uses Chromium, which lays some things out differently from Safari; run
-# this after changing layout and look at the pictures: it commits them to docs/ipad/ on the branch it ran on.
+# landscape), at each text size asked for. tools/screenshot.cjs uses Chromium, which lays some things out differently
+# from Safari; run this after changing layout and look at the pictures: it commits them to docs/ipad/ on the branch it ran on.
 name: iPad screenshots
 on:
   workflow_dispatch:
@@ -9,6 +9,12 @@ on:
       sample:
         description: Sample weather (rainLater, hot, cold, warm, rainNow)
         default: warm
+      devices:
+        description: Simulators, comma-separated (names as Xcode lists them)
+        default: iPad mini (A17 Pro), iPad Pro (11-inch) (4th generation), iPad Pro 13-inch (M4)
+      text_sizes:
+        description: Text sizes, comma-separated (extra-small ... large (the default) ... accessibility-extra-extra-extra-large)
+        default: large
 defaults:
   run:
     shell: bash
@@ -31,27 +37,35 @@ jobs:
       - name: Screenshots
         env:
           SAMPLE: ${{ inputs.sample }}
+          DEVICES: ${{ inputs.devices }}
+          TEXT_SIZES: ${{ inputs.text_sizes }}
         run: |
           cd app/ios
           case "$SAMPLE" in rainLater|hot|cold|warm|rainNow) ;; *) echo "unknown sample"; exit 1;; esac
           app=$(find build -name 'WeatherPenguin.app' -path '*iphonesimulator*' | head -1)
           runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='iOS' and x['isAvailable']]; print(r[-1]['identifier'])")
           mkdir -p shots
-          # the smallest, an 11-inch (2018-2022: 834 x 1194) and the biggest
-          for name in 'iPad mini (A17 Pro)' 'iPad Pro (11-inch) (4th generation)' 'iPad Pro 13-inch (M4)'; do
+          IFS=',' read -ra devices <<< "$DEVICES"; IFS=',' read -ra sizes <<< "$TEXT_SIZES"
+          for name in "${devices[@]}"; do
+            name=$(echo "$name" | sed 's/^ *//; s/ *$//')
             udid=$(xcrun simctl create "$name" "$name" "$runtime") || { echo "no simulator for $name"; continue; }
             xcrun simctl boot "$udid"; xcrun simctl bootstatus "$udid" -b
             xcrun simctl status_bar "$udid" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 || true
             xcrun simctl install "$udid" "$app"
             sleep 20   # boot banners pass
-            file=$(echo "$name" | tr -cs 'A-Za-z0-9' '-' | sed 's/-$//')
-            # portrait, then launched again and turned sideways after it has drawn (-rotate: debug builds only)
-            for turn in portrait landscape; do
-              xcrun simctl terminate "$udid" com.weatherpenguin.WeatherPenguin 2>/dev/null || true
-              xcrun simctl launch "$udid" com.weatherpenguin.WeatherPenguin -sample "$SAMPLE" -tour false -rotate "$turn"
-              sleep 12
-              xcrun simctl io "$udid" screenshot "shots/$file-$turn.png"
-              sips -Z 1400 "shots/$file-$turn.png" > /dev/null   # half size: enough to see the layout, smaller to commit
+            for size in "${sizes[@]}"; do
+              size=$(echo "$size" | tr -d ' ')
+              case "$size" in *[!a-z-]*|'') echo "bad text size"; exit 1;; esac
+              xcrun simctl ui "$udid" content_size "$size"
+              file=$(echo "$name" | tr -cs 'A-Za-z0-9' '-' | sed 's/-$//')$([ "$size" = large ] || echo "-$size")
+              # portrait, then launched again and turned sideways after it has drawn (-rotate: debug builds only)
+              for turn in portrait landscape; do
+                xcrun simctl terminate "$udid" com.weatherpenguin.WeatherPenguin 2>/dev/null || true
+                xcrun simctl launch "$udid" com.weatherpenguin.WeatherPenguin -sample "$SAMPLE" -tour false -rotate "$turn"
+                sleep 12
+                xcrun simctl io "$udid" screenshot "shots/$file-$turn.png"
+                sips -Z 1400 "shots/$file-$turn.png" > /dev/null   # half size: enough to see the layout, smaller to commit
+              done
             done
             xcrun simctl shutdown "$udid"; xcrun simctl delete "$udid"
           done
