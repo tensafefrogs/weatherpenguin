@@ -46,6 +46,13 @@ final class AppModel: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
       guard lastLoaded == nil else { return }   // once: coming to the foreground mustn't restart the tour
       lastLoaded = Date()
       webView?.evaluateJavaScript("WP.demo('\(sample)', \(UserDefaults.standard.bool(forKey: "tour")))")
+      // -rotate landscape: turn sideways a moment later, as someone turning an iPad (iPad screenshots workflow)
+      if UserDefaults.standard.string(forKey: "rotate") == "landscape" {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+          let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+          scene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight))
+        }
+      }
       return
     }
     #endif

@@ -1,6 +1,6 @@
 # The app itself (WKWebView, so Safari's layout engine) on iPad simulators of each size, with sample weather
-# (the debug build's launch arguments -sample <name>), in portrait: iPads are wide enough for Today and Tomorrow side
-# by side either way. tools/screenshot.cjs uses Chromium, which lays some things out differently from Safari; run
+# (the debug build's launch arguments -sample <name>), in portrait and turned to landscape after loading (-rotate
+# landscape): iPads are wide enough for Today and Tomorrow side by side either way. tools/screenshot.cjs uses Chromium, which lays some things out differently from Safari; run
 # this after changing layout and look at the pictures: it commits them to docs/ipad/ on the branch it ran on.
 name: iPad screenshots
 on:
@@ -38,7 +38,7 @@ jobs:
           runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='iOS' and x['isAvailable']]; print(r[-1]['identifier'])")
           mkdir -p shots
           # one of each width (points, portrait): mini 744, iPad (A16) 820, Air 11-inch 820, Pro 11-inch 834 (2018-2022)
-          # and 834 (M4), Pro 13-inch 1032; landscape is wider still, so two-up either way
+          # and 834 (M4), Pro 13-inch 1032
           for name in 'iPad mini (A17 Pro)' 'iPad (A16)' 'iPad Air 11-inch (M4)' 'iPad Pro (11-inch) (4th generation)' \
                       'iPad Pro 11-inch (M4)' 'iPad Pro 13-inch (M4)'; do
             udid=$(xcrun simctl create "$name" "$name" "$runtime") || { echo "no simulator for $name"; continue; }
@@ -46,11 +46,15 @@ jobs:
             xcrun simctl status_bar "$udid" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 || true
             xcrun simctl install "$udid" "$app"
             sleep 20   # boot banners pass
-            xcrun simctl launch "$udid" com.weatherpenguin.WeatherPenguin -sample "$SAMPLE" -tour false
-            sleep 8
             file=$(echo "$name" | tr -cs 'A-Za-z0-9' '-' | sed 's/-$//')
-            xcrun simctl io "$udid" screenshot "shots/$file.png"
-            sips -Z 1400 "shots/$file.png" > /dev/null   # half size: enough to see the layout, smaller to commit
+            # portrait, then launched again and turned sideways after it has drawn (-rotate: debug builds only)
+            for turn in portrait landscape; do
+              xcrun simctl terminate "$udid" com.weatherpenguin.WeatherPenguin 2>/dev/null || true
+              xcrun simctl launch "$udid" com.weatherpenguin.WeatherPenguin -sample "$SAMPLE" -tour false -rotate "$turn"
+              sleep 12
+              xcrun simctl io "$udid" screenshot "shots/$file-$turn.png"
+              sips -Z 1400 "shots/$file-$turn.png" > /dev/null   # half size: enough to see the layout, smaller to commit
+            done
             xcrun simctl shutdown "$udid"; xcrun simctl delete "$udid"
           done
           ls -l shots
