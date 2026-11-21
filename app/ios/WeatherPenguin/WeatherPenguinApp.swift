@@ -1,5 +1,6 @@
 import SwiftUI
 import UserNotifications
+import UIKit
 
 @main
 struct WeatherPenguinApp: App {
@@ -18,6 +19,14 @@ struct WeatherPenguinApp: App {
         .onChange(of: scenePhase) { _, phase in
           if phase == .active { model.refreshIfStale() }
         }
+        #if DEBUG
+        // -rotate first: sideways from the start, before the page has drawn (iPad screenshots workflow)
+        .onAppear {
+          guard UserDefaults.standard.string(forKey: "rotate") == "first" else { return }
+          let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+          scene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight))
+        }
+        #endif
     }
   }
 }
