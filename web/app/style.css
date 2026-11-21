@@ -44,9 +44,7 @@ img { -webkit-user-drag: none; }
   align-items: center;
   text-align: center;
   padding: calc(env(safe-area-inset-top) + 12px) 24px calc(env(safe-area-inset-bottom) + 64px);
-  /* a flex item is never narrower than its content unless told: Safari counts the drawing at its full 640 px,
-     which made two-up pages wider than half an 11-inch iPad and pushed Tomorrow off the edge */
-  min-width: 0;
+  min-width: 0;   /* side by side, each page gets half the screen, whatever its content would like */
 }
 
 /* The v1 raindrop tile, drawn at 2× (106×142 px → 53×71 pt). It fades out
@@ -83,14 +81,14 @@ img { -webkit-user-drag: none; }
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  /* the frame's size comes from the page around it, never from the drawing: so the drawing can't push the
+     numbers off the bottom or make a page wider than half the screen (Safari on an iPad, iPadOS 26.7, cold start) */
+  container-type: size;
 }
 .penguin-frame img {
-  /* shrinks to fit the frame's width or height, whichever is tighter, keeping the drawing whole */
-  width: auto;
+  /* as big as fits the frame's width or height, whichever is tighter, keeping the drawing whole */
+  width: min(100cqw, 100cqh * 640 / 880);
   height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  min-width: 0;
   aspect-ratio: 640 / 880;
   object-fit: cover;
   object-position: 50% 0;
