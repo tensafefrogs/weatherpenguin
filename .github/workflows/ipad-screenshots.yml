@@ -1,6 +1,6 @@
 # The app itself (WKWebView, so Safari's layout engine) on iPad simulators of each size, with sample weather
-# (the debug build's launch arguments -sample <name>), in portrait and turned to landscape after loading (-rotate
-# landscape), at each text size asked for. tools/screenshot.cjs uses Chromium, which lays some things out differently
+# (the debug build's launch arguments -sample <name>), in portrait, in landscape from the start (-rotate first) and turned
+# to landscape after loading (-rotate landscape), at each text size asked for. tools/screenshot.cjs uses Chromium, which lays some things out differently
 # from Safari; run this after changing layout and look at the pictures: it commits them to docs/ipad/ on the branch it ran on.
 name: iPad screenshots
 on:
@@ -58,8 +58,8 @@ jobs:
               case "$size" in *[!a-z-]*|'') echo "bad text size"; exit 1;; esac
               xcrun simctl ui "$udid" content_size "$size"
               file=$(echo "$name" | tr -cs 'A-Za-z0-9' '-' | sed 's/-$//')$([ "$size" = large ] || echo "-$size")
-              # portrait, then launched again and turned sideways after it has drawn (-rotate: debug builds only)
-              for turn in portrait landscape; do
+              # portrait; sideways from the start; turned sideways after it has drawn (-rotate: debug builds only)
+              for turn in portrait first landscape; do
                 xcrun simctl terminate "$udid" com.weatherpenguin.WeatherPenguin 2>/dev/null || true
                 xcrun simctl launch "$udid" com.weatherpenguin.WeatherPenguin -sample "$SAMPLE" -tour false -rotate "$turn"
                 sleep 12
